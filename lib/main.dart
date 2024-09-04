@@ -1,14 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'welcome/welcome_page.dart';
+import 'home/home_page.dart';
 
-void main() {
-  runApp(const MyApp());
+
+void main() async{
+  // 确保 Flutter 框架已初始化
+  WidgetsFlutterBinding.ensureInitialized();
+  final bool isLogin = await getLoginStatus();
+  runApp(MyApp(isLogin));
+}
+
+Future<bool> getLoginStatus() async{
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  // return prefs.getBool("Login_Status") ?? false;
+  return true;
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool isLogin;
+
+  const MyApp(this.isLogin, {super.key});
 
   // This widget is the root of your application.
   @override
@@ -19,7 +33,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const WelcomePage(),
+      home: isLogin ? const HomePage() : const WelcomePage(),
     );
   }
 }

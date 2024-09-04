@@ -1,26 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../home/home_page.dart';
 import '../message-notification/msg_notification_page.dart';
 import '../order/order_managing_page.dart';
+import '../personal-info/personal_info_page.dart';
 
-class PersonalInfoPage extends StatefulWidget {
-  const PersonalInfoPage({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
   @override
-  State<PersonalInfoPage> createState() => _PersonalInfoPageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _PersonalInfoPageState extends State<PersonalInfoPage> {
-  int _selectedIndex = 3;
+class _HomePageState extends State<HomePage> {
+  int _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
       body: Center(
-        child: Text("个人中心页面"),
+        child: Text("首页"),
       ),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.grey,

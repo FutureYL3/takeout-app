@@ -3,24 +3,24 @@ import 'package:get/get.dart';
 
 import '../home/home_page.dart';
 import '../message-notification/msg_notification_page.dart';
-import '../order/order_managing_page.dart';
+import '../personal-info/personal_info_page.dart';
 
-class PersonalInfoPage extends StatefulWidget {
-  const PersonalInfoPage({super.key});
+class OrderManagingPage extends StatefulWidget {
+  const OrderManagingPage({super.key});
 
   @override
-  State<PersonalInfoPage> createState() => _PersonalInfoPageState();
+  State<OrderManagingPage> createState() => _OrderManagingPageState();
 }
 
-class _PersonalInfoPageState extends State<PersonalInfoPage> {
-  int _selectedIndex = 3;
+class _OrderManagingPageState extends State<OrderManagingPage> {
+  int _selectedIndex = 1;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
       body: Center(
-        child: Text("个人中心页面"),
+        child: Text("订单管理页面"),
       ),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.grey,

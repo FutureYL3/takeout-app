@@ -11,12 +11,12 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
-  TextEditingController _phoneController = TextEditingController();
-  TextEditingController _codeController = TextEditingController();
-  TextEditingController _nameController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
-  TextEditingController _confirmPasswordController = TextEditingController();
-  GlobalKey _formKey = GlobalKey<FormState>();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _codeController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
+  final GlobalKey _formKey = GlobalKey<FormState>();
 
 
   @override
@@ -40,9 +40,11 @@ class _SignUpPageState extends State<SignUpPage> {
                   child: Column(
                     children: [
                       TextFormField(
+                        style: const TextStyle(fontSize: 14),
                         decoration: const InputDecoration(
                           labelText: '手机号',
                           hintText: "请输入手机号",
+                          border: OutlineInputBorder()
                         ),
                         controller: _phoneController,
                         validator: (value) {
@@ -56,14 +58,18 @@ class _SignUpPageState extends State<SignUpPage> {
                           return null;
                         },
                       ),
+                      const SizedBox(height: 20,),
                       Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.59,
-                              child: TextFormField(
+                            width: MediaQuery.of(context).size.width * 0.56,
+                            child: TextFormField(
+                              style: const TextStyle(fontSize: 14),
                               decoration: const InputDecoration(
                                 labelText: '验证码',
                                 hintText: "请输入验证码",
+                                border: OutlineInputBorder()
                               ),
                               controller: _codeController,
                               validator: (value) {
@@ -74,14 +80,13 @@ class _SignUpPageState extends State<SignUpPage> {
                               },
                             ),
                           ),
-                          SizedBox(width: MediaQuery.of(context).size.width * 0.01),
+                          SizedBox(width: MediaQuery.of(context).size.width * 0.04),
                           GestureDetector(
                             onTap: () {
                               
                             },
                             child: Container(
-                              margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.03),
-                              // padding: const EdgeInsets.only(top: 10),
+                              // margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.02),1
                               alignment: Alignment.center,
                               height: MediaQuery.of(context).size.height * 0.04,
                               width: MediaQuery.of(context).size.width * 0.2,
@@ -96,10 +101,13 @@ class _SignUpPageState extends State<SignUpPage> {
                           )
                         ],
                       ),
+                      const SizedBox(height: 20,),
                       TextFormField(
+                        style: const TextStyle(fontSize: 14),
                         decoration: const InputDecoration(
                           labelText: '使用人姓名',
-                          hintText: "请输入外卖员姓名"
+                          hintText: "请输入外卖员姓名",
+                          border: OutlineInputBorder()
                         ),
                         controller: _nameController,
                         validator: (value) {
@@ -109,13 +117,15 @@ class _SignUpPageState extends State<SignUpPage> {
                           return null;
                         },
                       ),
+                      const SizedBox(height: 20,),
                       TextFormField(
+                        style: const TextStyle(fontSize: 14),
                         decoration: const InputDecoration(
                           labelText: '登录密码',
                           hintText: "请输入登录密码",
-                          
+                          border: OutlineInputBorder()
                         ),
-                        // keyboardType: TextInputType.visiblePassword,
+                        keyboardType: TextInputType.visiblePassword,
                         obscureText: true,
                         controller: _passwordController,
                         validator: (value) {
@@ -125,12 +135,15 @@ class _SignUpPageState extends State<SignUpPage> {
                           return null;
                         },
                       ),
+                      const SizedBox(height: 20,),
                       TextFormField(
+                        style: const TextStyle(fontSize: 14),
                         decoration: const InputDecoration(
                           labelText: '确认登录密码',
                           hintText: "请再次输入登录密码",
+                          border: OutlineInputBorder()
                         ),
-                        // keyboardType: TextInputType.visiblePassword,
+                        keyboardType: TextInputType.visiblePassword,
                         obscureText: true,
                         controller: _confirmPasswordController,
                         validator: (value) {

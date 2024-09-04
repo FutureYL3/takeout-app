@@ -10,9 +10,7 @@ class WelcomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Welcome'),
-      ),
+      appBar: AppBar(),
       body: Center(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -27,7 +25,7 @@ class WelcomePage extends StatelessWidget {
             // 登录按钮
             GestureDetector(
               onTap: () {
-                Get.to(() => const SignUpPage());
+                Get.to(() => const LoginPage());
               },
               child: Container(
                 width: MediaQuery.of(context).size.width * 0.6,
