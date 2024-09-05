@@ -37,12 +37,12 @@ class _SignUpPageState extends State<SignUpPage> {
     // 发送请求
     Map<String, dynamic> response = await utils.getValidationCode(phoneNumber);
     if (response['code'] == 1) {
-      // 提交成功
-      showSnackBar('提交成功', '已发送验证码', ContentType.success, context);
+      // 获取成功
+      showSnackBar('获取验证码成功', '已发送验证码', ContentType.success, context);
       return;
     }
     // 提交失败
-    showSnackBar('提交失败', response['msg'], ContentType.failure, context);
+    showSnackBar('获取验证码失败', response['msg'], ContentType.failure, context);
   }
 
 
@@ -192,7 +192,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             final String password = _passwordController.text;
                             final SignUpApiService signUpApiService = SignUpApiService();
                             // 发送请求
-                            Map<String, dynamic> response = await signUpApiService.submit(phoneNumber, realName, validationCode, password);
+                            Map<String, dynamic> response = await signUpApiService.submit(phoneNumber, realName, validationCode, password, context);
 
                             if (response['code'] == 1) {
                               // 注册成功

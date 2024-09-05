@@ -39,7 +39,7 @@ class CommonUtilsApiService {
 
   Future<Map<String, dynamic>> getValidationCode(String phoneNumber) async {
     try {
-      // 发起 GET 请求，并将 phoneNumber 作为查询参数
+      // 发起 GET 请求，并将 phoneNumber 作为参数
       Response response = await _dio.get('/common/phone', queryParameters: {
         'phoneNumber': phoneNumber,
       });
@@ -55,18 +55,18 @@ class CommonUtilsApiService {
 }
 
 void showSnackBar(String title, String msg, ContentType type, BuildContext ctx) {
-    final snackBar = SnackBar(
-      elevation: 0,
-      behavior: SnackBarBehavior.floating,
-      backgroundColor: Colors.transparent,
-      content: AwesomeSnackbarContent(
-        title: title,
-        message: msg,
-        contentType: type,
-      ),
-    );
+  final snackBar = SnackBar(
+    elevation: 0,
+    behavior: SnackBarBehavior.floating,
+    backgroundColor: Colors.transparent,
+    content: AwesomeSnackbarContent(
+      title: title,
+      message: msg,
+      contentType: type,
+    ),
+  );
 
-    ScaffoldMessenger.of(ctx)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(snackBar);
-  }
+  ScaffoldMessenger.of(ctx)
+    ..hideCurrentSnackBar()
+    ..showSnackBar(snackBar);
+}

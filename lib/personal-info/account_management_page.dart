@@ -1,7 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../welcome/welcome_page.dart';
 
 class AccountManagementPage extends StatelessWidget {
-  const AccountManagementPage({super.key});
+  final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+  late final String phone;
+
+  AccountManagementPage({super.key}) {
+    phone = secureStorage.read(key: 'phone') as String;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,9 +35,9 @@ class AccountManagementPage extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           // 当前账号信息
-          const Text(
-            '当前账号：aaaaaaaaaa10000000',
-            style: TextStyle(fontSize: 16, color: Colors.black),
+          Text(
+            '当前账号：$phone',
+            style: const TextStyle(fontSize: 16, color: Colors.black),
           ),
           const SizedBox(height: 40),
           // 退出登录按钮
@@ -40,13 +50,16 @@ class AccountManagementPage extends StatelessWidget {
                   title: const Text('确认退出登录吗？'),
                   actions: [
                     TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
+                      onPressed: () => Get.back(),
                       child: const Text('取消'),
                     ),
                     TextButton(
-                      onPressed: () {
+                      onPressed: () async {
                         // 在这里处理实际的退出逻辑
-                        Navigator.of(context).pop();
+                        final SharedPreferences prefs = await SharedPreferences.getInstance();
+                        await prefs.setBool('Login_Status', false);
+                        await secureStorage.deleteAll();
+                        Get.offAll(() => const WelcomePage());
                       },
                       child: const Text('确认'),
                     ),

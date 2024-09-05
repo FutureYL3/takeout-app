@@ -22,9 +22,9 @@ class _PersonalCenterPageState extends State<PersonalCenterPage> {
 
   final List<Widget> _pages = [
     const PersonalInfoPage(),
-    PersonalBillPage(),
+    const PersonalBillPage(),
     ContactServicePage(),
-    const AccountManagementPage()
+    AccountManagementPage()
   ];
 
   @override

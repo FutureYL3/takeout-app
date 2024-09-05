@@ -19,7 +19,7 @@ class _MsgNotificationPageState extends State<MsgNotificationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: Center(
+      body:  const Center(
         child: Text("私信与通知页面"),
       ),
       bottomNavigationBar: BottomNavigationBar(

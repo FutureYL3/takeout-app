@@ -1,7 +1,13 @@
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:takeout/utils/common_utils.dart';
 
+import '../home/home_page.dart';
 import 'forget_password_page.dart';
+import 'login_apis.dart';
 import 'phone_login_page.dart';
 import '../signup/sign_up_page.dart';
 
@@ -17,6 +23,31 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final GlobalKey _formKey = GlobalKey<FormState>();
+
+  void login() async {
+    if ((_formKey.currentState as FormState).validate()) {
+      // 登录逻辑
+      final String phoneNumber = _phoneController.text;
+      final String password = _passwordController.text;
+      final LoginApiService loginApiService = LoginApiService();
+      const FlutterSecureStorage secureStorage = FlutterSecureStorage();
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      Map<String, dynamic> response = await loginApiService.loginWithPwd(phoneNumber, password, context);
+      if (response['code'] == 1) {
+        // 登录成功
+        await secureStorage.write(key: 'accessToken', value: response['data']['accessToken']);
+        await secureStorage.write(key: 'refreshToken', value: response['data']['refreshToken']);
+        await secureStorage.write(key: 'phone', value: phoneNumber);
+        await prefs.setBool('Login_Status', true);
+        Get.offAll(() => const HomePage());
+        return;
+      } else {
+        // 登录失败
+        showSnackBar('登录失败', response['msg'], ContentType.failure, context);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -113,11 +144,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       SizedBox(height: MediaQuery.sizeOf(context).height * 0.03),
                       GestureDetector(
-                        onTap: () {
-                          if ((_formKey.currentState as FormState).validate()) {
-                            // 发送请求
-                          }
-                        },
+                        onTap: login,
                         child: Container(
                           width: MediaQuery.of(context).size.width * 0.6,
                           padding: const EdgeInsets.all(10),

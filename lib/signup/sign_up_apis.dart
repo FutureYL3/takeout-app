@@ -1,4 +1,8 @@
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+
+import '../utils/common_utils.dart';
 
 class SignUpApiService {
   static const String baseUrl = 'https://api.example.com';
@@ -35,7 +39,7 @@ class SignUpApiService {
     // ));
 
   }  
-  Future<Map<String, dynamic>> submit(String phoneNumber, String realName, String validationCode, String password) async {
+  Future<Map<String, dynamic>> submit(String phoneNumber, String realName, String validationCode, String password, BuildContext ctx) async {
     try {
       Response response = await _dio.post('/courier/register', queryParameters: {
         'phoneNumber': phoneNumber,
@@ -47,7 +51,8 @@ class SignUpApiService {
       return response.data;
     } on DioException catch (e) {
       // 处理 Dio 的错误
-      throw Exception('Failed to get validation code: ${e.message}');
+      showSnackBar('提交失败', e.message!, ContentType.failure, ctx);
+      return {};
     }
   }
 }

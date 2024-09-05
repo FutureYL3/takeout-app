@@ -1,6 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:get/get.dart';
+import 'package:takeout/personal-info/personal_info_apis.dart';
+
+import '../welcome/welcome_page.dart';
+
+class BillData {
+  final String? orderNumber;
+  final double? earning;
+  final String? payMethod;
+
+  BillData({this.orderNumber, this.earning, this.payMethod});
+}
 
 class PersonalBillPage extends StatefulWidget {
+  const PersonalBillPage({super.key});
+
   @override
   State<PersonalBillPage> createState() => _PersonalBillPageState();
 }
@@ -8,8 +23,62 @@ class PersonalBillPage extends StatefulWidget {
 class _PersonalBillPageState extends State<PersonalBillPage> {
   String _selectedDateRange = '本日';
   String _selectedFilter = '全部';
+  final List<BillData> _billList = [];
+  double totalEarning = 0.0;
 
   final TextEditingController _searchController = TextEditingController();
+  final PersonalInfoApiService personalInfoApiService = PersonalInfoApiService();
+  final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+
+  void regetData() async {
+    // 发送请求
+    final String? phone = await secureStorage.read(key: 'phone');
+    Map<String, dynamic> response = await personalInfoApiService.getBillList(phone!, _selectedDateRange, '', _selectedFilter, context);
+    if (response['code'] == 1 && response['data']['isSuccess']) {
+      // 获取 data 数组
+      List<dynamic> dataList = response['data']['data'];
+      // 清空原数组
+      _billList.clear();
+
+      // 遍历 data 数组
+      for (var item in dataList) {
+        String orderNumber = item['orderNumber'];
+        double earning = item['earning'];
+        String payMethod = item['payMethod'];
+
+        _billList.add(BillData(orderNumber: orderNumber, earning: earning, payMethod: payMethod));
+        totalEarning += earning;
+      }
+    }
+  }
+
+  @override
+  void initState() async {
+    super.initState();
+    final String? phone = await secureStorage.read(key: 'phone');
+
+    if (phone == null) {
+      // 如果没有存储手机号，即表示未登录，跳转到欢迎页面
+      Get.offAll(() => const WelcomePage());
+      return;
+    }
+    // 发送请求
+    Map<String, dynamic> response = await personalInfoApiService.getBillList(phone, _selectedDateRange, '', _selectedFilter, context);
+    if (response['code'] == 1 && response['data']['isSuccess']) {
+      // 获取 data 数组
+      List<dynamic> dataList = response['data']['data'];
+
+      // 遍历 data 数组
+      for (var item in dataList) {
+        String orderNumber = item['orderNumber'];
+        double earning = item['earning'];
+        String payMethod = item['payMethod'];
+
+        _billList.add(BillData(orderNumber: orderNumber, earning: earning, payMethod: payMethod));
+        totalEarning += earning;
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +103,7 @@ class _PersonalBillPageState extends State<PersonalBillPage> {
                 onChanged: (newValue) {
                   setState(() {
                     _selectedDateRange = newValue!;
+                    regetData();
                   });
                 },
               ),
@@ -44,9 +114,9 @@ class _PersonalBillPageState extends State<PersonalBillPage> {
               ),
             ],
           ),
-          const Text(
-            '577.31',
-            style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+          Text(
+            totalEarning.toString(),
+            style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
           ),
           const Divider(),
           // 搜索与筛选
@@ -76,6 +146,7 @@ class _PersonalBillPageState extends State<PersonalBillPage> {
                 onChanged: (newValue) {
                   setState(() {
                     _selectedFilter = newValue!;
+                    regetData();
                   });
                 },
               ),
@@ -85,13 +156,9 @@ class _PersonalBillPageState extends State<PersonalBillPage> {
           // 订单明细列表
           Expanded(
             child: ListView(
-              children: [
-                _buildTransactionItem(
-                    'xxxxxxxxxxxxxxxxxxxxxxxx', '2元', '微信打款'),
-                _buildTransactionItem(
-                    'xxxxxxxxxxxxxxxxxxxxxxxx', '2元', '微信打款'),
-                // 可以根据实际数据继续添加
-              ],
+              children: _billList.map((item) {
+                return _buildTransactionItem(item.orderNumber ?? '', item.earning.toString(), item.payMethod!);
+              }).toList(),
             ),
           ),
         ],

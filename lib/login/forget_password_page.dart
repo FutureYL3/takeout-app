@@ -12,7 +12,7 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage>{
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: Center(
+      body: const Center(
         child: Text("忘记密码页面"),
       ),
     );

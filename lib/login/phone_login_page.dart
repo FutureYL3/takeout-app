@@ -1,5 +1,12 @@
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../home/home_page.dart';
+import '../utils/common_utils.dart';
+import 'login_apis.dart';
 
 class PhoneLoginPage extends StatefulWidget {
   const PhoneLoginPage({super.key});
@@ -12,6 +19,54 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _codeController = TextEditingController();
   final GlobalKey _formKey = GlobalKey<FormState>();
+  final CommonUtilsApiService utils = CommonUtilsApiService();
+  final LoginApiService loginApiService = LoginApiService();
+
+  void getValidationCode() async {
+    String phoneNumber = _phoneController.text;
+    RegExp regTel = RegExp(r'^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$');
+    if (phoneNumber.isEmpty) {
+      showSnackBar('获取验证码失败', '请输入手机号', ContentType.failure, context);
+      return;
+    }
+    if (!regTel.hasMatch(phoneNumber)) {
+      showSnackBar('获取验证码失败', '请输入正确的手机号', ContentType.failure, context);
+      return;
+    }
+    // 发送请求
+    Map<String, dynamic> response = await utils.getValidationCode(phoneNumber);
+    if (response['code'] == 1) {
+      // 获取成功
+      showSnackBar('获取验证码成功', '已发送验证码', ContentType.success, context);
+      return;
+    }
+    // 提交失败
+    showSnackBar('获取验证码失败', response['msg'], ContentType.failure, context);
+  }
+
+  void login() async {
+    if ((_formKey.currentState as FormState).validate()) {
+      // 登录逻辑
+      final String phoneNumber = _phoneController.text;
+      final String validationCode = _codeController.text;
+      const FlutterSecureStorage secureStorage = FlutterSecureStorage();
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      Map<String, dynamic> response = await loginApiService.loginWithCode(phoneNumber, validationCode, context);
+
+      if (response['code'] == 1) {
+        // 登录成功
+        await secureStorage.write(key: 'accessToken', value: response['data']['accessToken']);
+        await secureStorage.write(key: 'refreshToken', value: response['data']['refreshToken']);
+        await secureStorage.write(key: 'phone', value: phoneNumber);
+        await prefs.setBool('Login_Status', true);
+        Get.offAll(() => const HomePage());
+        return;
+      } else {
+        // 登录失败
+        showSnackBar('登录失败', response['msg'], ContentType.failure, context);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -85,9 +140,7 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
                                   ),
                                   SizedBox(width: MediaQuery.of(context).size.width * 0.04),
                                   GestureDetector(
-                                    onTap: () {
-                                      
-                                    },
+                                    onTap: getValidationCode,
                                     child: Container(
                                       // margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.02),1
                                       alignment: Alignment.center,
@@ -110,11 +163,7 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
                       ),
                       SizedBox(height: MediaQuery.sizeOf(context).height * 0.1),
                       GestureDetector(
-                        onTap: () {
-                          if ((_formKey.currentState as FormState).validate()) {
-                            // 发送请求
-                          }
-                        },
+                        onTap: login,
                         child: Container(
                           width: MediaQuery.of(context).size.width * 0.6,
                           padding: const EdgeInsets.all(10),

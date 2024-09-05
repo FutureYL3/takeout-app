@@ -19,7 +19,7 @@ class _OrderManagingPageState extends State<OrderManagingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: Center(
+      body: const Center(
         child: Text("订单管理页面"),
       ),
       bottomNavigationBar: BottomNavigationBar(
