@@ -1,10 +1,10 @@
 import 'package:dio/dio.dart';
 
-class SignUpApiService {
+class LoginApiService {
   static const String baseUrl = 'https://api.example.com';
   late Dio _dio;
 
-  SignUpApiService() {
+  LoginApiService() {
     BaseOptions options = BaseOptions(
       baseUrl: baseUrl,
       connectTimeout: const Duration(seconds: 10),
@@ -35,12 +35,10 @@ class SignUpApiService {
     // ));
 
   }  
-  Future<Map<String, dynamic>> submit(String phoneNumber, String realName, String validationCode, String password) async {
+  Future<Map<String, dynamic>> loginWithPwd(String phoneNumber, String password) async {
     try {
-      Response response = await _dio.post('/courier/register', queryParameters: {
+      Response response = await _dio.post('/courier/login/password', queryParameters: {
         'phoneNumber': phoneNumber,
-        'realName': realName,
-        'validationCode': validationCode,
         'password': password
       });
 

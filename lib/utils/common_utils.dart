@@ -1,10 +1,12 @@
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 
-class SignUpApiService {
+class CommonUtilsApiService {
   static const String baseUrl = 'https://api.example.com';
   late Dio _dio;
 
-  SignUpApiService() {
+  CommonUtilsApiService() {
     BaseOptions options = BaseOptions(
       baseUrl: baseUrl,
       connectTimeout: const Duration(seconds: 10),
@@ -33,21 +35,38 @@ class SignUpApiService {
     //     return handler.next(e); // Continue the error
     //   },
     // ));
+  }
 
-  }  
-  Future<Map<String, dynamic>> submit(String phoneNumber, String realName, String validationCode, String password) async {
+  Future<Map<String, dynamic>> getValidationCode(String phoneNumber) async {
     try {
-      Response response = await _dio.post('/courier/register', queryParameters: {
+      // 发起 GET 请求，并将 phoneNumber 作为查询参数
+      Response response = await _dio.get('/common/phone', queryParameters: {
         'phoneNumber': phoneNumber,
-        'realName': realName,
-        'validationCode': validationCode,
-        'password': password
       });
 
+      // 返回响应数据
       return response.data;
     } on DioException catch (e) {
       // 处理 Dio 的错误
       throw Exception('Failed to get validation code: ${e.message}');
     }
   }
+
 }
+
+void showSnackBar(String title, String msg, ContentType type, BuildContext ctx) {
+    final snackBar = SnackBar(
+      elevation: 0,
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: Colors.transparent,
+      content: AwesomeSnackbarContent(
+        title: title,
+        message: msg,
+        contentType: type,
+      ),
+    );
+
+    ScaffoldMessenger.of(ctx)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(snackBar);
+  }

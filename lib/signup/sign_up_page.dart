@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 
 import 'waiting_auth_page.dart';
+import '../utils/common_utils.dart';
+import 'sign_up_apis.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -17,6 +20,30 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
   final GlobalKey _formKey = GlobalKey<FormState>();
+
+  final CommonUtilsApiService utils = CommonUtilsApiService();
+
+  void getValidationCode() async {
+    String phoneNumber = _phoneController.text;
+    RegExp regTel = RegExp(r'^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$');
+    if (phoneNumber.isEmpty) {
+      showSnackBar('获取验证码失败', '请输入手机号', ContentType.failure, context);
+      return;
+    }
+    if (!regTel.hasMatch(phoneNumber)) {
+      showSnackBar('获取验证码失败', '请输入正确的手机号', ContentType.failure, context);
+      return;
+    }
+    // 发送请求
+    Map<String, dynamic> response = await utils.getValidationCode(phoneNumber);
+    if (response['code'] == 1) {
+      // 提交成功
+      showSnackBar('提交成功', '已发送验证码', ContentType.success, context);
+      return;
+    }
+    // 提交失败
+    showSnackBar('提交失败', response['msg'], ContentType.failure, context);
+  }
 
 
   @override
@@ -82,9 +109,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           ),
                           SizedBox(width: MediaQuery.of(context).size.width * 0.04),
                           GestureDetector(
-                            onTap: () {
-                              
-                            },
+                            onTap: getValidationCode,
                             child: Container(
                               // margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.02),1
                               alignment: Alignment.center,
@@ -158,14 +183,25 @@ class _SignUpPageState extends State<SignUpPage> {
                       ),
                       SizedBox(height: MediaQuery.sizeOf(context).height * 0.04),
                       ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
                           if ((_formKey.currentState as FormState).validate()) {
                             // 提交表单
-                            
-                            if (true) {
-                              // 提交成功
-                              Get.to(() => const WaitingAuthPage());
+                            final String phoneNumber = _passwordController.text;
+                            final String validationCode = _codeController.text;
+                            final String realName = _nameController.text;
+                            final String password = _passwordController.text;
+                            final SignUpApiService signUpApiService = SignUpApiService();
+                            // 发送请求
+                            Map<String, dynamic> response = await signUpApiService.submit(phoneNumber, realName, validationCode, password);
+
+                            if (response['code'] == 1) {
+                              // 注册成功
+                              Get.off(() => const WaitingAuthPage());
+                              return;
                             }
+
+                            // 注册失败
+                            showSnackBar('注册失败', response['msg'], ContentType.failure, context);
                           }
                         },
                         child: const Text('提交'),
