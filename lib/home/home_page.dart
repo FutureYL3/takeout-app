@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 
 import '../message-notification/msg_notification_page.dart';
 import '../order/order_managing_page.dart';
-import '../personal-info/personal_info_page.dart';
+import '../personal-info/personal_center_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -67,7 +67,7 @@ class _HomePageState extends State<HomePage> {
         Get.off(() => const MsgNotificationPage());
         break;
       case 3:
-        Get.off(() => const PersonalInfoPage());
+        Get.off(() => const PersonalCenterPage());
         break;      
     }
   }

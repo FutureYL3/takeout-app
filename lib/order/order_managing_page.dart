@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 
 import '../home/home_page.dart';
 import '../message-notification/msg_notification_page.dart';
-import '../personal-info/personal_info_page.dart';
+import '../personal-info/personal_center_page.dart';
 
 class OrderManagingPage extends StatefulWidget {
   const OrderManagingPage({super.key});
@@ -67,7 +67,7 @@ class _OrderManagingPageState extends State<OrderManagingPage> {
         Get.off(() => const MsgNotificationPage());
         break;
       case 3:
-        Get.off(() => const PersonalInfoPage());
+        Get.off(() => const PersonalCenterPage());
         break;      
     }
   }

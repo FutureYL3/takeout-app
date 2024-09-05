@@ -16,7 +16,7 @@ void main() async{
 Future<bool> getLoginStatus() async{
   SharedPreferences prefs = await SharedPreferences.getInstance();
   // return prefs.getBool("Login_Status") ?? false;
-  return true;
+  return false;
 }
 
 class MyApp extends StatelessWidget {
@@ -29,10 +29,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: 'App Name',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
+      theme: ThemeData.light(),
       home: isLogin ? const HomePage() : const WelcomePage(),
     );
   }

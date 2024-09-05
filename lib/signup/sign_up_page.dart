@@ -161,6 +161,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         onPressed: () {
                           if ((_formKey.currentState as FormState).validate()) {
                             // 提交表单
+                            
                             if (true) {
                               // 提交成功
                               Get.to(() => const WaitingAuthPage());
