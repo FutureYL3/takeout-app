@@ -1,4 +1,4 @@
-package com.example.takeout
+package com.dushe.kssdt
 
 import io.flutter.embedding.android.FlutterActivity
 
