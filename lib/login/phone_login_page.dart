@@ -144,10 +144,10 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
                                     child: Container(
                                       // margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.02),1
                                       alignment: Alignment.center,
-                                      height: MediaQuery.of(context).size.height * 0.04,
+                                      height: MediaQuery.of(context).size.height * 0.05,
                                       width: MediaQuery.of(context).size.width * 0.2,
                                       decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
+                                        borderRadius: BorderRadius.circular(20),
                                         border: Border.all(color: Colors.green),
                                       ),
                                       child: const Text(

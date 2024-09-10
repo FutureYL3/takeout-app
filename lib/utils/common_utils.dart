@@ -46,12 +46,32 @@ class CommonUtilsApiService {
 
       // 返回响应数据
       return response.data;
-    } on DioException catch (e) {
+    } on DioException {
       // 处理 Dio 的错误
-      throw Exception('Failed to get validation code: ${e.message}');
+      return {
+        'error': true
+      };
     }
   }
 
+  // TODO: 添加一个新的方法，用于验证验证码
+  Future<Map<String, dynamic>> checkValidationCode(String phoneNumber, String validationCode) async {
+    try {
+      // 发起 POST 请求，并将 phoneNumber 和 validationCode 作为参数
+      Response response = await _dio.post('/common/phone', queryParameters: {
+        'phoneNumber': phoneNumber,
+        'validationCode': validationCode,
+      });
+
+      // 返回响应数据
+      return response.data;
+    } on DioException {
+      // 处理 Dio 的错误
+      return {
+        'error': true
+      };
+    }
+  }
 }
 
 void showSnackBar(String title, String msg, ContentType type, BuildContext ctx) {

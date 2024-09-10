@@ -67,4 +67,20 @@ class LoginApiService {
       return {};
     }
   }
+
+  // TODO
+  Future<Map<String, dynamic>> resetPassword(String phoneNumber, String password) async {
+    try {
+      Response response = await _dio.get('/common/phone', queryParameters: {
+        'phoneNumber': phoneNumber,
+        'password': password
+      });
+
+      return response.data;
+    } on DioException {
+      return {
+        'error': true
+      };
+    }
+  }
 }

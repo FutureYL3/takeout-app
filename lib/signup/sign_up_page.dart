@@ -183,6 +183,9 @@ class _SignUpPageState extends State<SignUpPage> {
                       ),
                       SizedBox(height: MediaQuery.sizeOf(context).height * 0.04),
                       ElevatedButton(
+                        style: ButtonStyle(
+                          minimumSize: WidgetStateProperty.resolveWith((states) => Size(MediaQuery.of(context).size.width * 0.5, MediaQuery.of(context).size.height * 0.05)),
+                        ),
                         onPressed: () async {
                           if ((_formKey.currentState as FormState).validate()) {
                             // 提交表单
