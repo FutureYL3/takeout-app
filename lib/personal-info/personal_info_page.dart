@@ -13,28 +13,33 @@ class PersonalInfoPage extends StatefulWidget {
 }
 
 class _PersonalInfoPageState extends State<PersonalInfoPage> {
-  late final String imageUrl;
-  late final String id;
-  late final String? phone;
+  String? imageUrl;
+  String? id;
+  String? phone;
   final PersonalInfoApiService personalInfoApiService = PersonalInfoApiService();
   final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
 
   @override
-  void initState() async {
+  void initState() {
     super.initState();
+    getData();
+  }
+
+  void getData() async {
     phone = await secureStorage.read(key: 'phone');
-    if (phone == null) {
+    if (/*phone == null*/ false) {
       // 如果没有存储手机号，即表示未登录，跳转到欢迎页面
-      Get.offAll(() => const WelcomePage());
+      await Get.offAll(() => const WelcomePage());
       return;
     }
     // 请求成功，保存数据
-    Map<String, dynamic> response = await personalInfoApiService.getPersonalInfo(phone!, context);
+    Map<String, dynamic> response = await personalInfoApiService.getPersonalInfo(phone ?? '', context);
     if (response['code'] == 1 && response['data']['isSuccess']) {
       id = response['data']['id'];
       imageUrl = response['data']['imageURL'];
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +61,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
             ],
           ),
           const SizedBox(height: 20),
-          Text(id),
+          Text(id ?? ''),
           const SizedBox(height: 10),
           Text(phone ?? ''),
           const SizedBox(height: 20),

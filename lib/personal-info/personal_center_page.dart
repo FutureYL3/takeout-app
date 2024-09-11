@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:takeout/personal-info/area_management_page.dart';
 
 import '../home/home_page.dart';
 import '../message-notification/msg_notification_page.dart';
@@ -24,7 +25,8 @@ class _PersonalCenterPageState extends State<PersonalCenterPage> {
     const PersonalInfoPage(),
     const PersonalBillPage(),
     ContactServicePage(),
-    AccountManagementPage()
+    AccountManagementPage(),
+    const AreaManagementPage()
   ];
 
   @override
@@ -58,6 +60,7 @@ class _PersonalCenterPageState extends State<PersonalCenterPage> {
                 _buildMenuItem('个人账单', 1),
                 _buildMenuItem('联系客服', 2),
                 _buildMenuItem('账号管理', 3),
+                _buildMenuItem('区域管理', 4)
               ],
             ),
           ),

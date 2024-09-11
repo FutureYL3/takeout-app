@@ -7,10 +7,15 @@ import '../welcome/welcome_page.dart';
 
 class AccountManagementPage extends StatelessWidget {
   final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
-  late final String phone;
+  String? phone;
 
   AccountManagementPage({super.key}) {
-    phone = secureStorage.read(key: 'phone') as String;
+    init();
+  }
+
+  void init() async {
+    await secureStorage.write(key: 'phone', value: '12345678901');
+    phone = await secureStorage.read(key: 'phone');
   }
 
   @override

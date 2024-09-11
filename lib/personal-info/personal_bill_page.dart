@@ -53,17 +53,22 @@ class _PersonalBillPageState extends State<PersonalBillPage> {
   }
 
   @override
-  void initState() async {
+  void initState() {
     super.initState();
+    getData();
+  }
+
+  void getData() async {
     final String? phone = await secureStorage.read(key: 'phone');
 
-    if (phone == null) {
+    // TODO: 为了方便调试，暂时注释掉
+    if (/*phone == null*/ false) {
       // 如果没有存储手机号，即表示未登录，跳转到欢迎页面
-      Get.offAll(() => const WelcomePage());
+      await Get.offAll(() => const WelcomePage());
       return;
     }
     // 发送请求
-    Map<String, dynamic> response = await personalInfoApiService.getBillList(phone, _selectedDateRange, '', _selectedFilter, context);
+    Map<String, dynamic> response = await personalInfoApiService.getBillList(phone ?? '', _selectedDateRange, '', _selectedFilter, context);
     if (response['code'] == 1 && response['data']['isSuccess']) {
       // 获取 data 数组
       List<dynamic> dataList = response['data']['data'];

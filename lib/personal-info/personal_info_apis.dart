@@ -32,7 +32,8 @@ class PersonalInfoApiService {
         String? accessToken = await secureStorage.read(key: 'accessToken');
         String? refreshToken = await secureStorage.read(key: 'refreshToken');
         // 如果未登录，跳转到欢迎页面
-        if (accessToken == null || refreshToken == null) {
+        // TODO
+        if (/*accessToken == null || refreshToken == null*/ false) {
           Get.offAll(() => const WelcomePage());
         }
         // TODO: 检查两个token是否过期
@@ -65,6 +66,35 @@ class PersonalInfoApiService {
     } on DioException catch (e) {
       // 处理 Dio 的错误
       showSnackBar('获取个人信息失败', e.message!, ContentType.failure, ctx);
+      return {};
+    }
+  }
+
+  Future<Map<String, dynamic>> getDeliveryArea(String phone, BuildContext ctx) async {
+    try {
+      Response response = await _dio.post('/courier/viewWorkingarea', queryParameters: {
+        'phone': phone,
+      });
+
+      return response.data;
+    } on DioException catch (e) {
+      // 处理 Dio 的错误
+      showSnackBar('获取配送区域信息失败', e.message!, ContentType.failure, ctx);
+      return {};
+    }
+  }
+
+  Future<Map<String, dynamic>> updateDeliveryArea(String phone, String location, BuildContext ctx) async {
+    try {
+      Response response = await _dio.put('/courier/updateWorkingarea', queryParameters: {
+        'phone': phone,
+        'location': location,
+      });
+
+      return response.data;
+    } on DioException catch (e) {
+      // 处理 Dio 的错误
+      showSnackBar('更新配送区域信息失败', e.message!, ContentType.failure, ctx);
       return {};
     }
   }

@@ -70,6 +70,18 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage>{
     // Get.to(() => ResetPasswordPage(phoneNumber: phoneController.text));
     // return;
 
+    RegExp regTel = RegExp(r'^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$');
+
+    if (phoneController.text.isEmpty) {
+      showSnackBar('错误', '手机号不能为空', ContentType.failure, context);
+      return;
+    }
+
+    if (!regTel.hasMatch(phoneController.text)) {
+      showSnackBar('错误', '请输入正确的手机号', ContentType.failure, context);
+      return;
+    }
+
     // 验证码为空
     if (codeController.text.isEmpty) {
       showSnackBar('错误', '验证码不能为空', ContentType.failure, context);
