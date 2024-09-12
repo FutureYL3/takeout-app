@@ -41,7 +41,7 @@ class SignUpApiService {
   }  
   Future<Map<String, dynamic>> submit(String phoneNumber, String realName, String validationCode, String password, BuildContext ctx) async {
     try {
-      Response response = await _dio.post('/courier/register', queryParameters: {
+      Response response = await _dio.post('/courier/register', data: {
         'phoneNumber': phoneNumber,
         'realName': realName,
         'validationCode': validationCode,

@@ -3,7 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 class CommonUtilsApiService {
-  static const String baseUrl = 'https://api.example.com';
+  static const String baseUrl = 'http://114.55.108.97:8080';
   late Dio _dio;
 
   CommonUtilsApiService() {
@@ -58,7 +58,7 @@ class CommonUtilsApiService {
   Future<Map<String, dynamic>> checkValidationCode(String phoneNumber, String validationCode) async {
     try {
       // 发起 POST 请求，并将 phoneNumber 和 validationCode 作为参数
-      Response response = await _dio.post('/common/phone', queryParameters: {
+      Response response = await _dio.post('/common/phone', data: {
         'phoneNumber': phoneNumber,
         'validationCode': validationCode,
       });

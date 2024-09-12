@@ -14,8 +14,13 @@ class AccountManagementPage extends StatelessWidget {
   }
 
   void init() async {
-    await secureStorage.write(key: 'phone', value: '12345678901');
     phone = await secureStorage.read(key: 'phone');
+
+    if (phone == null) {
+      // 如果没有存储手机号，即表示未登录，跳转到欢迎页面
+      await Get.offAll(() => const WelcomePage());
+      return;
+    }
   }
 
   @override
@@ -60,7 +65,7 @@ class AccountManagementPage extends StatelessWidget {
                     ),
                     TextButton(
                       onPressed: () async {
-                        // 在这里处理实际的退出逻辑
+                        // 退出逻辑
                         final SharedPreferences prefs = await SharedPreferences.getInstance();
                         await prefs.setBool('Login_Status', false);
                         await secureStorage.deleteAll();

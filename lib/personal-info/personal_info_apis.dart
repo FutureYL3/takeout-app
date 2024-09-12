@@ -11,7 +11,7 @@ import '../welcome/welcome_page.dart';
 
 class PersonalInfoApiService {
   final FlutterSecureStorage  secureStorage = const FlutterSecureStorage();
-  static const String baseUrl = 'https://api.example.com';
+  static const String baseUrl = 'http://114.55.108.97:8080';
   late Dio _dio;
 
   PersonalInfoApiService() {
@@ -32,8 +32,8 @@ class PersonalInfoApiService {
         String? accessToken = await secureStorage.read(key: 'accessToken');
         String? refreshToken = await secureStorage.read(key: 'refreshToken');
         // 如果未登录，跳转到欢迎页面
-        // TODO
-        if (/*accessToken == null || refreshToken == null*/ false) {
+        
+        if (accessToken == null || refreshToken == null) {
           Get.offAll(() => const WelcomePage());
         }
         // TODO: 检查两个token是否过期
@@ -58,7 +58,7 @@ class PersonalInfoApiService {
   
   Future<Map<String, dynamic>> getPersonalInfo(String phone, BuildContext ctx) async {
     try {
-      Response response = await _dio.post('/courier/person_info', queryParameters: {
+      Response response = await _dio.post('/courier/person_info', data: {
         'phone': phone,
       });
 
@@ -72,7 +72,7 @@ class PersonalInfoApiService {
 
   Future<Map<String, dynamic>> getDeliveryArea(String phone, BuildContext ctx) async {
     try {
-      Response response = await _dio.post('/courier/viewWorkingarea', queryParameters: {
+      Response response = await _dio.post('/courier/viewWorkingarea', data: {
         'phone': phone,
       });
 
@@ -86,7 +86,7 @@ class PersonalInfoApiService {
 
   Future<Map<String, dynamic>> updateDeliveryArea(String phone, String location, BuildContext ctx) async {
     try {
-      Response response = await _dio.put('/courier/updateWorkingarea', queryParameters: {
+      Response response = await _dio.put('/courier/updateWorkingarea', data: {
         'phone': phone,
         'location': location,
       });
@@ -151,7 +151,7 @@ class PersonalInfoApiService {
 
   Future<Map<String, dynamic>> getBillList(String phone, String dateRange, String like, String type, BuildContext ctx) async {
     try {
-      Response response = await _dio.post('/courier/viewEarningsHistory', queryParameters: {
+      Response response = await _dio.post('/courier/viewEarningsHistory', data: {
         'phone': phone,
         'dateRange': dateRange,
         'like': like,

@@ -27,13 +27,13 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
 
   void getData() async {
     phone = await secureStorage.read(key: 'phone');
-    if (/*phone == null*/ false) {
+    if (phone == null) {
       // 如果没有存储手机号，即表示未登录，跳转到欢迎页面
       await Get.offAll(() => const WelcomePage());
       return;
     }
     // 请求成功，保存数据
-    Map<String, dynamic> response = await personalInfoApiService.getPersonalInfo(phone ?? '', context);
+    Map<String, dynamic> response = await personalInfoApiService.getPersonalInfo(phone!, context);
     if (response['code'] == 1 && response['data']['isSuccess']) {
       id = response['data']['id'];
       imageUrl = response['data']['imageURL'];
@@ -61,9 +61,9 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
             ],
           ),
           const SizedBox(height: 20),
-          Text(id ?? ''),
+          Text("实名验证：${id ?? ''}"),
           const SizedBox(height: 10),
-          Text(phone ?? ''),
+          Text("手机号：${phone ?? ''}"),
           const SizedBox(height: 20),
           ElevatedButton(
             onPressed: () {

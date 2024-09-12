@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:takeout/utils/common_utils.dart';
 
 class LoginApiService {
-  static const String baseUrl = 'https://api.example.com';
+  static const String baseUrl = 'http://114.55.108.97:8080';
   late Dio _dio;
 
   LoginApiService() {
@@ -40,7 +40,7 @@ class LoginApiService {
   }  
   Future<Map<String, dynamic>> loginWithPwd(String phoneNumber, String password, BuildContext ctx) async {
     try {
-      Response response = await _dio.post('/courier/login/password', queryParameters: {
+      Response response = await _dio.post('/courier/login/password', data: {
         'phoneNumber': phoneNumber,
         'password': password
       });

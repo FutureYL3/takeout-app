@@ -33,22 +33,33 @@ class _PersonalBillPageState extends State<PersonalBillPage> {
   void regetData() async {
     // 发送请求
     final String? phone = await secureStorage.read(key: 'phone');
-    Map<String, dynamic> response = await personalInfoApiService.getBillList(phone!, _selectedDateRange, '', _selectedFilter, context);
+    if (phone == null) {
+      // 如果没有存储手机号，即表示未登录，跳转到欢迎页面
+      await Get.offAll(() => const WelcomePage());
+      return;
+    }
+    Map<String, dynamic> response = await personalInfoApiService.getBillList(phone, _selectedDateRange, '', _selectedFilter, context);
     if (response['code'] == 1 && response['data']['isSuccess']) {
       // 获取 data 数组
       List<dynamic> dataList = response['data']['data'];
       // 清空原数组
       _billList.clear();
-
+      List<BillData> regetList = [];
+      double regetEarning = 0.0;
       // 遍历 data 数组
       for (var item in dataList) {
         String orderNumber = item['orderNumber'];
         double earning = item['earning'];
         String payMethod = item['payMethod'];
+        
 
-        _billList.add(BillData(orderNumber: orderNumber, earning: earning, payMethod: payMethod));
-        totalEarning += earning;
+        regetList.add(BillData(orderNumber: orderNumber, earning: earning, payMethod: payMethod));
+        regetEarning += earning;
       }
+      setState(() {
+        _billList.addAll(regetList);
+        totalEarning = regetEarning;
+      });
     }
   }
 
@@ -61,14 +72,14 @@ class _PersonalBillPageState extends State<PersonalBillPage> {
   void getData() async {
     final String? phone = await secureStorage.read(key: 'phone');
 
-    // TODO: 为了方便调试，暂时注释掉
-    if (/*phone == null*/ false) {
+    
+    if (phone == null) {
       // 如果没有存储手机号，即表示未登录，跳转到欢迎页面
       await Get.offAll(() => const WelcomePage());
       return;
     }
     // 发送请求
-    Map<String, dynamic> response = await personalInfoApiService.getBillList(phone ?? '', _selectedDateRange, '', _selectedFilter, context);
+    Map<String, dynamic> response = await personalInfoApiService.getBillList(phone, _selectedDateRange, '', _selectedFilter, context);
     if (response['code'] == 1 && response['data']['isSuccess']) {
       // 获取 data 数组
       List<dynamic> dataList = response['data']['data'];

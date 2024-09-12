@@ -44,7 +44,7 @@ class _LoginPageState extends State<LoginPage> {
         return;
       } else {
         // 登录失败
-        showSnackBar('登录失败', response['msg'], ContentType.failure, context);
+        showSnackBar('登录失败', response['msg'] ?? '请检查用户名或密码', ContentType.failure, context);
       }
     }
   }
@@ -84,6 +84,7 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                 ),
                                 controller: _phoneController,
+                                keyboardType: TextInputType.phone,
                                 validator: (value) {
                                   RegExp regTel = RegExp(r'^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$');
                                   if (value!.isEmpty) {
@@ -105,6 +106,8 @@ class _LoginPageState extends State<LoginPage> {
                                   )
                                 ),
                                 controller: _passwordController,
+                                obscureText: true,
+                                keyboardType: TextInputType.visiblePassword,
                                 validator: (value) {
                                   if (value!.isEmpty) {
                                     return '请输入密码';
