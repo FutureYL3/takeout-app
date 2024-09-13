@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
+import 'package:takeout/dto/personal_info_dto.dart';
 import 'package:takeout/personal-info/personal_info_apis.dart';
 
 import '../welcome/welcome_page.dart';
@@ -14,10 +15,11 @@ class PersonalInfoPage extends StatefulWidget {
 
 class _PersonalInfoPageState extends State<PersonalInfoPage> {
   String? imageUrl;
-  String? id;
+  String? idCardNumber;
   String? phone;
   final PersonalInfoApiService personalInfoApiService = PersonalInfoApiService();
   final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+  PersonalInfoDto dto = PersonalInfoDto();
 
   @override
   void initState() {
@@ -26,19 +28,30 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
   }
 
   void getData() async {
-    phone = await secureStorage.read(key: 'phone');
-    if (phone == null) {
+    final String? getPhone = await secureStorage.read(key: 'phone');
+    if (getPhone == null) {
       // 如果没有存储手机号，即表示未登录，跳转到欢迎页面
       await Get.offAll(() => const WelcomePage());
       return;
     }
     // 请求成功，保存数据
-    Map<String, dynamic> response = await personalInfoApiService.getPersonalInfo(phone!, context);
-    if (response['code'] == 1 && response['data']['isSuccess']) {
-      id = response['data']['id'];
-      imageUrl = response['data']['imageURL'];
+    Map<String, dynamic> response = await personalInfoApiService.getPersonalInfo(getPhone, context);
+    if (response['code'] == 1) {
+      setState(() {
+        idCardNumber  = response['data']['id_card_number'];
+        imageUrl = response['data']['imageURL'];
+        phone = getPhone;
+      });
     }
   }
+
+  void _pickAndUploadImage() async {
+    // 选择图片并上传
+    // personalInfoApiService.dio.options.headers['Content-Type'] = 'multipart/form-data';
+    personalInfoApiService.uploadImage(dto, context);
+    getData();
+  }
+
 
 
   @override
@@ -53,24 +66,37 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
             children: [
               const Text('头像：'),
               const SizedBox(width: 20),
-              Container(
-                width: 100,
-                height: 100,
-                color: Colors.grey[300],
+              // Container(
+              //   width: 100,
+              //   height: 100,
+              //   color: Colors.grey[300],
+              // ),
+              GestureDetector(
+                onTap: _pickAndUploadImage,  // 点击头像选择图片并上传
+                child: CircleAvatar(
+                  radius: 50, // 头像的半径大小
+                  backgroundImage: imageUrl != null && imageUrl!.isNotEmpty
+                      ? NetworkImage(imageUrl!) // 显示网络头像
+                      : null, // 如果没有头像，显示默认图标
+                  backgroundColor: Colors.grey[300], // 没有头像时的背景色
+                  child: imageUrl == null || imageUrl!.isEmpty
+                      ? const Icon(Icons.person, size: 50)  // 默认显示图标
+                      : null,
+                ),
               ),
             ],
           ),
           const SizedBox(height: 20),
-          Text("实名验证：${id ?? ''}"),
+          Text("实名验证：${idCardNumber ?? ''}"),
           const SizedBox(height: 10),
           Text("手机号：${phone ?? ''}"),
           const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () {
-              // 修改资料按钮点击事件
-            },
-            child: const Text('修改资料'),
-          ),
+          // ElevatedButton(
+          //   onPressed: () {
+          //     // 修改资料按钮点击事件
+          //   },
+          //   child: const Text('修改资料'),
+          // ),
         ],
       )
     );

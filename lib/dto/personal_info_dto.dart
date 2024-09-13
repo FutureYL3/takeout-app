@@ -1,19 +1,19 @@
 class PersonalInfoDto {
-  late final String? phoneNumber;
-  late final String? account;
-  late final String? password;
-  late final String? email;
-  late final String? realName;
-  late final String? idCardNumber;
-  late final String? deliveryArea;
-  late final String? workStatus;
-  late final String? vehicleType;
-  late final String? createTime;
-  late final String? updateTime;
-  late final String? deleteStatus;
-  late final String? version;
-  late final String? courierStatus;
-  late final String? imageUrl;
+  String? phoneNumber;
+  String? account;
+  String? password;
+  String? email;
+  String? realName;
+  String? idCardNumber;
+  String? deliveryArea;
+  String? workStatus;
+  String? vehicleType;
+  String? createTime;
+  String? updateTime;
+  String? deleteStatus;
+  String? version;
+  String? courierStatus;
+  String? imageUrl;
 
   PersonalInfoDto({
     this.account,

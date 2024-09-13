@@ -71,7 +71,7 @@ class _LoginPageState extends State<LoginPage> {
                     children: [
                       SizedBox(
                         width: MediaQuery.of(context).size.width * 0.7,
-                        child:Form(
+                        child: Form(
                           key: _formKey,
                           child: Column(
                             children: [
@@ -90,9 +90,9 @@ class _LoginPageState extends State<LoginPage> {
                                   if (value!.isEmpty) {
                                     return '请输入手机号';
                                   }
-                                  if (!regTel.hasMatch(value)) {
-                                    return '请输入正确的手机号';
-                                  }
+                                  // if (!regTel.hasMatch(value)) {
+                                  //   return '请输入正确的手机号';
+                                  // }
                                   return null;
                                 },
                               ),

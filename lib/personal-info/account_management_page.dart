@@ -5,22 +5,35 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../welcome/welcome_page.dart';
 
-class AccountManagementPage extends StatelessWidget {
+class AccountManagementPage extends StatefulWidget {
+  const AccountManagementPage({super.key});
+
+  @override
+  State<AccountManagementPage> createState() => _AccountManagementPageState();
+}
+
+class _AccountManagementPageState extends State<AccountManagementPage> {
   final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
   String? phone;
 
-  AccountManagementPage({super.key}) {
-    init();
-  }
-
   void init() async {
-    phone = await secureStorage.read(key: 'phone');
+    
+    final String? getPhone = await secureStorage.read(key: 'phone');
 
-    if (phone == null) {
+    if (getPhone == null) {
       // 如果没有存储手机号，即表示未登录，跳转到欢迎页面
       await Get.offAll(() => const WelcomePage());
       return;
     }
+    setState(() {
+      phone = getPhone;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    init();
   }
 
   @override
@@ -87,3 +100,7 @@ class AccountManagementPage extends StatelessWidget {
     );
   }
 }
+
+// class AccountManagementPage extends StatelessWidget {
+  
+// }

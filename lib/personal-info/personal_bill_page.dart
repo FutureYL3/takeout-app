@@ -39,7 +39,7 @@ class _PersonalBillPageState extends State<PersonalBillPage> {
       return;
     }
     Map<String, dynamic> response = await personalInfoApiService.getBillList(phone, _selectedDateRange, '', _selectedFilter, context);
-    if (response['code'] == 1 && response['data']['isSuccess']) {
+    if (response['code'] == 1) {
       // 获取 data 数组
       List<dynamic> dataList = response['data']['data'];
       // 清空原数组
@@ -80,19 +80,25 @@ class _PersonalBillPageState extends State<PersonalBillPage> {
     }
     // 发送请求
     Map<String, dynamic> response = await personalInfoApiService.getBillList(phone, _selectedDateRange, '', _selectedFilter, context);
-    if (response['code'] == 1 && response['data']['isSuccess']) {
+    if (response['code'] == 1) {
       // 获取 data 数组
-      List<dynamic> dataList = response['data']['data'];
-
+      List<dynamic> dataList = response['data'];
+      List<BillData> tempBillList = [];
+      double tempTotalEarning = 0.0;
       // 遍历 data 数组
       for (var item in dataList) {
         String orderNumber = item['orderNumber'];
         double earning = item['earning'];
-        String payMethod = item['payMethod'];
+        String payMethod = item['payMethod'] == 0 ? '微信支付' : '支付宝支付';
 
-        _billList.add(BillData(orderNumber: orderNumber, earning: earning, payMethod: payMethod));
-        totalEarning += earning;
+        
+        tempBillList.add(BillData(orderNumber: orderNumber, earning: earning, payMethod: payMethod));
+        tempTotalEarning += earning;
       }
+      setState(() {
+        _billList.addAll(tempBillList);
+        totalEarning = tempTotalEarning;
+      });
     }
   }
 

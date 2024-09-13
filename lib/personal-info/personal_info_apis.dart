@@ -11,8 +11,9 @@ import '../welcome/welcome_page.dart';
 
 class PersonalInfoApiService {
   final FlutterSecureStorage  secureStorage = const FlutterSecureStorage();
-  static const String baseUrl = 'http://114.55.108.97:8080';
-  late Dio _dio;
+  // static const String baseUrl = 'http://114.55.108.97:8080';
+  static const String baseUrl = 'http://172.20.10.2:8080';
+  late Dio dio;
 
   PersonalInfoApiService() {
     BaseOptions options = BaseOptions(
@@ -23,10 +24,10 @@ class PersonalInfoApiService {
         'Content-Type': 'application/json',
       },
     );
-    _dio = Dio(options);
+    dio = Dio(options);
 
     // 添加拦截器
-    _dio.interceptors.add(InterceptorsWrapper(
+    dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
         // 在请求发送之前检查和添加token
         String? accessToken = await secureStorage.read(key: 'accessToken');
@@ -37,6 +38,7 @@ class PersonalInfoApiService {
           Get.offAll(() => const WelcomePage());
         }
         // TODO: 检查两个token是否过期
+
 
         options.headers['token'] = accessToken;
         options.headers['refreshToken'] = refreshToken;
@@ -58,10 +60,10 @@ class PersonalInfoApiService {
   
   Future<Map<String, dynamic>> getPersonalInfo(String phone, BuildContext ctx) async {
     try {
-      Response response = await _dio.post('/courier/person_info', data: {
+      Response response = await dio.get('/courier/person_info', queryParameters: {
         'phone': phone,
       });
-
+      print(response);
       return response.data;
     } on DioException catch (e) {
       // 处理 Dio 的错误
@@ -72,10 +74,10 @@ class PersonalInfoApiService {
 
   Future<Map<String, dynamic>> getDeliveryArea(String phone, BuildContext ctx) async {
     try {
-      Response response = await _dio.post('/courier/viewWorkingarea', data: {
+      Response response = await dio.get('/courier/viewWorkingarea', queryParameters: {
         'phone': phone,
       });
-
+      print(response);
       return response.data;
     } on DioException catch (e) {
       // 处理 Dio 的错误
@@ -86,7 +88,7 @@ class PersonalInfoApiService {
 
   Future<Map<String, dynamic>> updateDeliveryArea(String phone, String location, BuildContext ctx) async {
     try {
-      Response response = await _dio.put('/courier/updateWorkingarea', data: {
+      Response response = await dio.put('/courier/updateWorkingarea', data: {
         'phone': phone,
         'location': location,
       });
@@ -101,7 +103,7 @@ class PersonalInfoApiService {
 
   Future<Map<String, dynamic>> updatePersonalInfo(PersonalInfoDto dto, BuildContext ctx) async {
     try {
-      Response response = await _dio.put('/courier/changePersonInfo', data: dto.toJson());
+      Response response = await dio.put('/courier/changePersonInfo', data: dto.toJson());
 
       return response.data;
     } on DioException catch (e) {
@@ -119,18 +121,27 @@ class PersonalInfoApiService {
       try {
         // 构建 FormData
         FormData formData = FormData.fromMap({
-          'file': await MultipartFile.fromFile(image.path),
+          'image': await MultipartFile.fromFile(image.path),
         });
+        print(formData);
+        print(image.path);
 
         // 发送 POST 请求
-        Response response = await _dio.post('/courier/setPersonImage', data: formData);
+        Response response = await dio.post('/courier/uploadPersonImage', data: formData, 
+          options: Options(
+            headers: {
+              'Content-Type': 'multipart/form-data',  // 设置 Content-Type
+            },
+        ),);
 
         // 处理响应
         Map<String, dynamic> result = response.data;
+        // print(result);
 
-        if (result['code'] == 1 && result['data']['isSuccess']) {
+        if (result['code'] == 1) {
           // 上传成功
-          dto.imageUrl = result['data']['image'];
+          print(result);
+          dto.imageUrl = result['data'];
           showSnackBar('上传成功', '成功上传了头像', ContentType.success, ctx);
         } else {
           // 上传失败
@@ -138,9 +149,11 @@ class PersonalInfoApiService {
         }
       } on DioException catch (e) {
         // 处理 Dio 的错误并反馈给用户
+        print(e.message);
         showSnackBar('上传失败', 'Failed to upload image: ${e.message}', ContentType.failure, ctx);
       } catch (e) {
         // 处理其他潜在的错误
+        print(e.toString());
         showSnackBar('上传失败', 'An unknown error occurred: ${e.toString()}', ContentType.failure, ctx);
       }
     } else {
@@ -151,7 +164,7 @@ class PersonalInfoApiService {
 
   Future<Map<String, dynamic>> getBillList(String phone, String dateRange, String like, String type, BuildContext ctx) async {
     try {
-      Response response = await _dio.post('/courier/viewEarningsHistory', data: {
+      Response response = await dio.get('/courier/viewEarningsHistory', queryParameters: {
         'phone': phone,
         'dateRange': dateRange,
         'like': like,
@@ -162,6 +175,18 @@ class PersonalInfoApiService {
     } on DioException catch (e) {
       // 处理 Dio 的错误
       showSnackBar('获取账单失败', e.message!, ContentType.failure, ctx);
+      return {};
+    }
+  }
+
+   Future<Map<String, dynamic>> refreshAccessToken(String refreshToken, BuildContext ctx) async {
+    try {
+      Response response = await dio.post('/common/newToken/login/');
+
+      return response.data;
+    } on DioException catch (e) {
+      // 处理 Dio 的错误
+      showSnackBar('刷新令牌失败', e.message!, ContentType.failure, ctx);
       return {};
     }
   }
