@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:takeout/dto/personal_info_dto.dart';
 import 'package:takeout/personal-info/personal_info_apis.dart';
 
@@ -29,6 +30,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
 
   void getData() async {
     final String? getPhone = await secureStorage.read(key: 'phone');
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
     if (getPhone == null) {
       // 如果没有存储手机号，即表示未登录，跳转到欢迎页面
       await Get.offAll(() => const WelcomePage());
@@ -36,6 +38,22 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
     }
     // 请求成功，保存数据
     Map<String, dynamic> response = await personalInfoApiService.getPersonalInfo(getPhone, context);
+
+    if (response['code'] == 401) {
+      Map<String, dynamic> refreshData = await personalInfoApiService.refreshAccessToken(context);
+      if (refreshData['code'] == 409) {
+        // 如果refreshToken也过期了，要求重新登录
+        await secureStorage.deleteAll();
+        await prefs.setBool('Login_Status', false);
+        Get.offAll(() => const WelcomePage());
+        return;
+      }
+      if (refreshData['code'] == 1) {
+        secureStorage.write(key: 'accessToken', value: refreshData['data']['accessToken']);
+        secureStorage.write(key: 'refreshToken', value: refreshData['data']['refreshToken']);
+      }
+      getData();
+    }
     if (response['code'] == 1) {
       setState(() {
         idCardNumber  = response['data']['id_card_number'];

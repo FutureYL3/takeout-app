@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:takeout/personal-info/personal_info_apis.dart';
 
 import '../welcome/welcome_page.dart';
@@ -33,12 +34,28 @@ class _PersonalBillPageState extends State<PersonalBillPage> {
   void regetData() async {
     // 发送请求
     final String? phone = await secureStorage.read(key: 'phone');
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
     if (phone == null) {
       // 如果没有存储手机号，即表示未登录，跳转到欢迎页面
       await Get.offAll(() => const WelcomePage());
       return;
     }
     Map<String, dynamic> response = await personalInfoApiService.getBillList(phone, _selectedDateRange, '', _selectedFilter, context);
+    if (response['code'] == 409) {
+      // 如果refreshToken也过期了，要求重新登录
+      await secureStorage.deleteAll();
+      await prefs.setBool('Login_Status', false);
+      Get.offAll(() => const WelcomePage());
+    }
+    if (response['code'] == 401) {
+      Map<String, dynamic> refreshData = await personalInfoApiService.refreshAccessToken(context);
+      if (refreshData['code'] == 1) {
+        secureStorage.write(key: 'accessToken', value: refreshData['data']['accessToken']);
+        secureStorage.write(key: 'refreshToken', value: refreshData['data']['refreshToken']);
+      }
+      regetData();
+    }
+
     if (response['code'] == 1) {
       // 获取 data 数组
       List<dynamic> dataList = response['data']['data'];
@@ -71,7 +88,7 @@ class _PersonalBillPageState extends State<PersonalBillPage> {
 
   void getData() async {
     final String? phone = await secureStorage.read(key: 'phone');
-
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
     
     if (phone == null) {
       // 如果没有存储手机号，即表示未登录，跳转到欢迎页面
@@ -80,6 +97,22 @@ class _PersonalBillPageState extends State<PersonalBillPage> {
     }
     // 发送请求
     Map<String, dynamic> response = await personalInfoApiService.getBillList(phone, _selectedDateRange, '', _selectedFilter, context);
+    if (response['code'] == 401) {
+      Map<String, dynamic> refreshData = await personalInfoApiService.refreshAccessToken(context);
+      if (refreshData['code'] == 409) {
+        // 如果refreshToken也过期了，要求重新登录
+        await secureStorage.deleteAll();
+        await prefs.setBool('Login_Status', false);
+        Get.offAll(() => const WelcomePage());
+        return;
+      }
+      if (refreshData['code'] == 1) {
+        secureStorage.write(key: 'accessToken', value: refreshData['data']['accessToken']);
+        secureStorage.write(key: 'refreshToken', value: refreshData['data']['refreshToken']);
+      }
+      getData();
+    }
+
     if (response['code'] == 1) {
       // 获取 data 数组
       List<dynamic> dataList = response['data'];

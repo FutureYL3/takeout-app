@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      title: 'App Name',
+      title: '康食速点通',
       theme: ThemeData.light(),
       home: isLogin ? const HomePage() : const WelcomePage(),
     );

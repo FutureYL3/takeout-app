@@ -39,14 +39,15 @@ class _AreaManagementPageState extends State<AreaManagementPage> {
     }
 
     Map<String, dynamic> response = await personalInfoApiService.getDeliveryArea(phone!, context);
-    if (response['code'] == 409) {
-      // 如果refreshToken也过期了，要求重新登录
-      await secureStorage.deleteAll();
-      await prefs.setBool('Login_Status', false);
-      Get.offAll(() => const WelcomePage());
-    }
     if (response['code'] == 401) {
       Map<String, dynamic> refreshData = await personalInfoApiService.refreshAccessToken(context);
+      if (refreshData['code'] == 409) {
+        // 如果refreshToken也过期了，要求重新登录
+        await secureStorage.deleteAll();
+        await prefs.setBool('Login_Status', false);
+        Get.offAll(() => const WelcomePage());
+        return;
+      }
       if (refreshData['code'] == 1) {
         secureStorage.write(key: 'accessToken', value: refreshData['data']['accessToken']);
         secureStorage.write(key: 'refreshToken', value: refreshData['data']['refreshToken']);
@@ -77,7 +78,7 @@ class _AreaManagementPageState extends State<AreaManagementPage> {
                 const SizedBox(height: 10),
                 DropdownButton<String>(
                   value: modifiedArea,
-                  items: <String>['我是修改工作区域2132', '校区2', '校区3']
+                  items: <String>['校区1', '校区2', '校区3']
                       .map((String value) {
                     return DropdownMenuItem<String>(
                       value: value,

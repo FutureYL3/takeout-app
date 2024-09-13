@@ -1,9 +1,12 @@
+import 'dart:convert';
+
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart' hide Response, FormData, MultipartFile;
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:takeout/utils/common_utils.dart';
 
 import '../dto/personal_info_dto.dart';
@@ -11,8 +14,8 @@ import '../welcome/welcome_page.dart';
 
 class PersonalInfoApiService {
   final FlutterSecureStorage  secureStorage = const FlutterSecureStorage();
-  // static const String baseUrl = 'http://114.55.108.97:8080';
-  static const String baseUrl = 'http://172.20.10.2:8080';
+  static const String baseUrl = 'http://114.55.108.97:8080';
+  // static const String baseUrl = 'http://172.20.10.2:8080';
   late Dio dio;
 
   PersonalInfoApiService() {
@@ -37,18 +40,22 @@ class PersonalInfoApiService {
         if (accessToken == null || refreshToken == null) {
           Get.offAll(() => const WelcomePage());
         }
-        // TODO: 检查两个token是否过期
-
 
         options.headers['token'] = accessToken;
         options.headers['refreshToken'] = refreshToken;
         return handler.next(options); // Continue the request
       },
-      // onResponse: (response, handler) {
-      //   // 在响应数据返回之前做一些处理
-      //   print('Response: ${response.statusCode} ${response.data}');
-      //   return handler.next(response); // Continue the response
-      // },
+      onResponse: (response, handler) {
+        // 如果响应是字符串，尝试手动解析
+        if (response.data is String) {
+          try {
+            response.data = jsonDecode(response.data);
+          } catch (e) {
+            print("Failed to parse response JSON: $e");
+          }
+        }
+        return handler.next(response);
+      },
       // onError: (DioException e, handler) {
       //   // 在发生错误时做一些处理
       //   print('Error: ${e.response?.statusCode} ${e.message}');
@@ -57,6 +64,18 @@ class PersonalInfoApiService {
     ));
 
   }  
+
+  Future<void> _requestPermissions() async {
+  var status = await Permission.photos.status;
+  if (!status.isGranted) {
+    await Permission.photos.request(); // 请求访问相册权限
+  }
+
+  var cameraStatus = await Permission.camera.status;
+  if (!cameraStatus.isGranted) {
+    await Permission.camera.request(); // 请求相机权限
+  }
+}
   
   Future<Map<String, dynamic>> getPersonalInfo(String phone, BuildContext ctx) async {
     try {
@@ -114,6 +133,8 @@ class PersonalInfoApiService {
   }
 
   Future<void> uploadImage(PersonalInfoDto dto, BuildContext ctx) async {
+    await _requestPermissions(); // 请求权限
+
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
 
@@ -123,8 +144,8 @@ class PersonalInfoApiService {
         FormData formData = FormData.fromMap({
           'image': await MultipartFile.fromFile(image.path),
         });
-        print(formData);
-        print(image.path);
+        // print(formData);
+        // print(image.path);
 
         // 发送 POST 请求
         Response response = await dio.post('/courier/uploadPersonImage', data: formData, 
@@ -140,7 +161,7 @@ class PersonalInfoApiService {
 
         if (result['code'] == 1) {
           // 上传成功
-          print(result);
+          // print(result);
           dto.imageUrl = result['data'];
           showSnackBar('上传成功', '成功上传了头像', ContentType.success, ctx);
         } else {
@@ -149,11 +170,11 @@ class PersonalInfoApiService {
         }
       } on DioException catch (e) {
         // 处理 Dio 的错误并反馈给用户
-        print(e.message);
+        // print(e.message);
         showSnackBar('上传失败', 'Failed to upload image: ${e.message}', ContentType.failure, ctx);
       } catch (e) {
         // 处理其他潜在的错误
-        print(e.toString());
+        // print(e.toString());
         showSnackBar('上传失败', 'An unknown error occurred: ${e.toString()}', ContentType.failure, ctx);
       }
     } else {
@@ -179,10 +200,11 @@ class PersonalInfoApiService {
     }
   }
 
-   Future<Map<String, dynamic>> refreshAccessToken(String refreshToken, BuildContext ctx) async {
+   Future<Map<String, dynamic>> refreshAccessToken(BuildContext ctx) async {
+    print('尝试刷新token');
     try {
       Response response = await dio.post('/common/newToken/login/');
-
+      print('成功刷新token');
       return response.data;
     } on DioException catch (e) {
       // 处理 Dio 的错误
