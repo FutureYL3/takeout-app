@@ -65,8 +65,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
 
   void _pickAndUploadImage() async {
     // 选择图片并上传
-    // personalInfoApiService.dio.options.headers['Content-Type'] = 'multipart/form-data';
-    personalInfoApiService.uploadImage(dto, context);
+    await personalInfoApiService.uploadImage(dto, context);
     getData();
   }
 
@@ -84,11 +83,6 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
             children: [
               const Text('头像：'),
               const SizedBox(width: 20),
-              // Container(
-              //   width: 100,
-              //   height: 100,
-              //   color: Colors.grey[300],
-              // ),
               GestureDetector(
                 onTap: _pickAndUploadImage,  // 点击头像选择图片并上传
                 child: CircleAvatar(
@@ -109,12 +103,6 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
           const SizedBox(height: 10),
           Text("手机号：${phone ?? ''}"),
           const SizedBox(height: 20),
-          // ElevatedButton(
-          //   onPressed: () {
-          //     // 修改资料按钮点击事件
-          //   },
-          //   child: const Text('修改资料'),
-          // ),
         ],
       )
     );

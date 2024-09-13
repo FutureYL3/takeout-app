@@ -58,7 +58,7 @@ class _PersonalBillPageState extends State<PersonalBillPage> {
 
     if (response['code'] == 1) {
       // 获取 data 数组
-      List<dynamic> dataList = response['data']['data'];
+      List<dynamic> dataList = response['data'];
       // 清空原数组
       _billList.clear();
       List<BillData> regetList = [];
@@ -67,7 +67,7 @@ class _PersonalBillPageState extends State<PersonalBillPage> {
       for (var item in dataList) {
         String orderNumber = item['orderNumber'];
         double earning = item['earning'];
-        String payMethod = item['payMethod'];
+        String payMethod = item['payMethod'] == 0 ? '微信支付' : '支付宝支付';
         
 
         regetList.add(BillData(orderNumber: orderNumber, earning: earning, payMethod: payMethod));

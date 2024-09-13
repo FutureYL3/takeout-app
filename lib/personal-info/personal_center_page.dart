@@ -25,7 +25,7 @@ class _PersonalCenterPageState extends State<PersonalCenterPage> {
     const PersonalInfoPage(),
     const PersonalBillPage(),
     ContactServicePage(),
-    AccountManagementPage(),
+    const AccountManagementPage(),
     const AreaManagementPage()
   ];
 

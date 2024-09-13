@@ -100,7 +100,3 @@ class _AccountManagementPageState extends State<AccountManagementPage> {
     );
   }
 }
-
-// class AccountManagementPage extends StatelessWidget {
-  
-// }

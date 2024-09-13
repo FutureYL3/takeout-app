@@ -90,9 +90,9 @@ class _LoginPageState extends State<LoginPage> {
                                   if (value!.isEmpty) {
                                     return '请输入手机号';
                                   }
-                                  // if (!regTel.hasMatch(value)) {
-                                  //   return '请输入正确的手机号';
-                                  // }
+                                  if (!regTel.hasMatch(value)) {
+                                    return '请输入正确的手机号';
+                                  }
                                   return null;
                                 },
                               ),

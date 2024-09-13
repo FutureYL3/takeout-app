@@ -14,8 +14,8 @@ import '../welcome/welcome_page.dart';
 
 class PersonalInfoApiService {
   final FlutterSecureStorage  secureStorage = const FlutterSecureStorage();
-  static const String baseUrl = 'http://114.55.108.97:8080';
-  // static const String baseUrl = 'http://172.20.10.2:8080';
+  // static const String baseUrl = 'http://114.55.108.97:8080';
+  static const String baseUrl = 'http://47.99.35.140:8080';
   late Dio dio;
 
   PersonalInfoApiService() {
@@ -43,7 +43,7 @@ class PersonalInfoApiService {
 
         options.headers['token'] = accessToken;
         options.headers['refreshToken'] = refreshToken;
-        return handler.next(options); // Continue the request
+        return handler.next(options); 
       },
       onResponse: (response, handler) {
         // 如果响应是字符串，尝试手动解析
@@ -56,11 +56,6 @@ class PersonalInfoApiService {
         }
         return handler.next(response);
       },
-      // onError: (DioException e, handler) {
-      //   // 在发生错误时做一些处理
-      //   print('Error: ${e.response?.statusCode} ${e.message}');
-      //   return handler.next(e); // Continue the error
-      // },
     ));
 
   }  
@@ -82,7 +77,7 @@ class PersonalInfoApiService {
       Response response = await dio.get('/courier/person_info', queryParameters: {
         'phone': phone,
       });
-      print(response);
+      // print(response);
       return response.data;
     } on DioException catch (e) {
       // 处理 Dio 的错误
@@ -96,7 +91,7 @@ class PersonalInfoApiService {
       Response response = await dio.get('/courier/viewWorkingarea', queryParameters: {
         'phone': phone,
       });
-      print(response);
+      // print(response);
       return response.data;
     } on DioException catch (e) {
       // 处理 Dio 的错误
@@ -201,10 +196,10 @@ class PersonalInfoApiService {
   }
 
    Future<Map<String, dynamic>> refreshAccessToken(BuildContext ctx) async {
-    print('尝试刷新token');
+    // print('尝试刷新token');
     try {
       Response response = await dio.post('/common/newToken/login/');
-      print('成功刷新token');
+      // print('成功刷新token');
       return response.data;
     } on DioException catch (e) {
       // 处理 Dio 的错误
