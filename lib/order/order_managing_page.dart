@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:takeout/order/order_accepted_page.dart';
+import 'package:takeout/order/order_cancelled_page.dart';
+import 'package:takeout/order/order_completed_page.dart';
+import 'package:takeout/order/order_delivering_page.dart';
+import 'package:takeout/order/order_pending_page.dart';
 
 import '../home/home_page.dart';
 import '../message-notification/msg_notification_page.dart';
@@ -14,13 +19,51 @@ class OrderManagingPage extends StatefulWidget {
 
 class _OrderManagingPageState extends State<OrderManagingPage> {
   int _selectedIndex = 1;
+  int _selectedItem = 0;
+
+  // 存储已经加载的页面
+  final Map<int, Widget> _loadedPages = {};
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
-      body: const Center(
-        child: Text("订单管理页面"),
+      appBar: AppBar(
+        title: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('xxxxxx外卖端'),
+            SizedBox(width: 10),
+            Text(
+              '在线',
+              style: TextStyle(fontSize: 14, color: Colors.grey),
+            ),
+            Icon(Icons.circle, color: Colors.green, size: 10),
+          ],
+        ),
+        centerTitle: true,
+        automaticallyImplyLeading: false,
+      ),
+      body: Row(
+        children: [
+          // 左侧菜单栏
+          Container(
+            width: 90,
+            color: Colors.grey[200],
+            child: ListView(
+              children: [
+                _buildMenuItem('待处理', 0),
+                _buildMenuItem('已接单', 1),
+                _buildMenuItem('配送中', 2),
+                _buildMenuItem('已完成', 3),
+                _buildMenuItem('已取消', 4)
+              ],
+            ),
+          ),
+          // 右侧内容区
+          Expanded(
+            child: _buildPageContent(_selectedItem),
+          ),
+        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.grey,
@@ -49,6 +92,53 @@ class _OrderManagingPageState extends State<OrderManagingPage> {
         type: BottomNavigationBarType.fixed, // 确保所有项都显示 label
       ),
     );
+  }
+
+  Widget _buildMenuItem(String title, int index) {
+    return InkWell(
+      onTap: () {
+        setState(() {
+          _selectedItem = index;
+        });
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Text(
+          title,
+          style: TextStyle(
+            color: _selectedItem == index ? Colors.blue : Colors.black,
+            fontWeight: _selectedItem == index ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// 通过懒加载来构建页面，只有在用户点击菜单时才加载页面
+  Widget _buildPageContent(int index) {
+    if (_loadedPages.containsKey(index)) {
+      return _loadedPages[index]!;
+    }
+
+    switch (index) {
+      case 0:
+        _loadedPages[index] = const OrderPendingPage();
+        break;
+      case 1:
+        _loadedPages[index] = const OrderAcceptedPage();
+        break;
+      case 2:
+        _loadedPages[index] = const OrderDeliveringPage();
+        break;
+      case 3:
+        _loadedPages[index] = const OrderCompletedPage();
+        break;
+      case 4:
+        _loadedPages[index] = const OrderCancelledPage();
+        break;
+    }
+
+    return _loadedPages[index]!;
   }
 
   void _bottomNavigationBarOnTap(int value) {
