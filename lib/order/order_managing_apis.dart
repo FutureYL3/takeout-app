@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart' hide Response;
+import 'package:intl/intl.dart';
 
 import '../utils/common_utils.dart';
 import '../welcome/welcome_page.dart';
@@ -56,10 +57,19 @@ class OrderManagingApiService {
     ));
   }
 
-  Future<Map<String, dynamic>> getOrders(String phone, DateTime start, DateTime end, int status, String like, BuildContext ctx) async {
+  Future<Map<String, dynamic>> getOrders(String phone, DateTime start, DateTime end, int status, String? like, BuildContext ctx) async {
     try {
-      // TODO
-      Response response = await dio.get('xxx');
+      // 时间日期格式化为yyyy-MM-dd
+      String startDate = DateFormat('yyyy-MM-dd').format(start);
+      String endDate = DateFormat('yyyy-MM-dd').format(end);
+
+      Response response = await dio.get('/courier/orderlooking', queryParameters: {
+        'phoneNumber': phone,
+        'beginDate': startDate,
+        'endDate': endDate,
+        'status': status,
+        'like': like,
+      });
 
       return response.data;
     } on DioException catch (e) {
@@ -89,13 +99,30 @@ class OrderManagingApiService {
 
   Future<Map<String, dynamic>> updateOrders(String phone, int orderId, int updatedStatus, BuildContext ctx) async {
     try {
-      // TODO
-      Response response = await dio.get('xxx');
+      
+      Response response = await dio.put('/courier/orderUpdate', data: {
+        'phoneNumber': phone,
+        'order_id': orderId,
+        'updatedStatus': updatedStatus,
+      });
 
       return response.data;
     } on DioException catch (e) {
       // 处理 Dio 的错误
       showSnackBar('更新订单$orderId状态失败', e.message!, ContentType.failure, ctx);
+      return {};
+    }
+  }
+
+  Future<Map<String, dynamic>> refreshAccessToken(BuildContext ctx) async {
+    // print('尝试刷新token');
+    try {
+      Response response = await dio.post('/common/newToken/login/');
+      // print('成功刷新token');
+      return response.data;
+    } on DioException catch (e) {
+      // 处理 Dio 的错误
+      showSnackBar('刷新令牌失败', e.message!, ContentType.failure, ctx);
       return {};
     }
   }

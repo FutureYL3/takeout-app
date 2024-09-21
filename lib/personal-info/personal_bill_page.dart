@@ -41,19 +41,21 @@ class _PersonalBillPageState extends State<PersonalBillPage> {
       return;
     }
     Map<String, dynamic> response = await personalInfoApiService.getBillList(phone, _selectedDateRange, '', _selectedFilter, context);
-    if (response['code'] == 409) {
-      // 如果refreshToken也过期了，要求重新登录
-      await secureStorage.deleteAll();
-      await prefs.setBool('Login_Status', false);
-      Get.offAll(() => const WelcomePage());
-    }
     if (response['code'] == 401) {
       Map<String, dynamic> refreshData = await personalInfoApiService.refreshAccessToken(context);
+      if (refreshData['code'] == 409) {
+        // 如果refreshToken也过期了，要求重新登录
+        await secureStorage.deleteAll();
+        await prefs.setBool('Login_Status', false);
+        Get.offAll(() => const WelcomePage());
+        return;
+      }
       if (refreshData['code'] == 1) {
         secureStorage.write(key: 'accessToken', value: refreshData['data']['accessToken']);
         secureStorage.write(key: 'refreshToken', value: refreshData['data']['refreshToken']);
       }
       regetData();
+      return;
     }
 
     if (response['code'] == 1) {
@@ -111,6 +113,7 @@ class _PersonalBillPageState extends State<PersonalBillPage> {
         secureStorage.write(key: 'refreshToken', value: refreshData['data']['refreshToken']);
       }
       getData();
+      return;
     }
 
     if (response['code'] == 1) {

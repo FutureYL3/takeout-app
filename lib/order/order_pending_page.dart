@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:takeout/order/order_card.dart';
+import 'package:takeout/order/order_managing_apis.dart';
+
+import '../welcome/welcome_page.dart';
 
 class OrderPendingPage extends StatefulWidget {
   const OrderPendingPage({super.key});
@@ -10,15 +16,166 @@ class OrderPendingPage extends StatefulWidget {
 
 class _OrderPendingPageState extends State<OrderPendingPage> with AutomaticKeepAliveClientMixin {
   String _selectedDate = '今日';
-  String? like;
   List<OrderCardWithButton>? orders;
+  final OrderManagingApiService apiService = OrderManagingApiService();
+  final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    // TODO: 发出网络请求获取订单
+    
+    getData();
   }
 
+  void getData() async {
+    String? phone = await secureStorage.read(key: 'phone');
+    int status = 1;
+    // 初次加载时默认显示今日订单
+    DateTime now = DateTime.now();
+    DateTime start = DateTime(now.year, now.month, now.day);
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    if (phone == null) {
+      // 如果没有存储手机号，即表示未登录，跳转到欢迎页面
+      await Get.offAll(() => const WelcomePage());
+      return;
+    }
+    
+    // 初次获取数据时like为null,不进行模糊搜索
+    Map<String, dynamic> result = await apiService.getOrders(phone, start, now, status, null, context);
+    
+    if (result['code'] == 401) {
+      Map<String, dynamic> refreshData = await apiService.refreshAccessToken(context);
+      if (refreshData['code'] == 409) {
+        // 如果refreshToken也过期了，要求重新登录
+        await secureStorage.deleteAll();
+        await prefs.setBool('Login_Status', false);
+        Get.offAll(() => const WelcomePage());
+        return;
+      }
+      if (refreshData['code'] == 1) {
+        secureStorage.write(key: 'accessToken', value: refreshData['data']['accessToken']);
+        secureStorage.write(key: 'refreshToken', value: refreshData['data']['refreshToken']);
+      }
+      getData();
+      return;
+    }
+
+    if (result['code'] == 1) {
+      List<dynamic> dataList = result['data'];
+      List<OrderCardWithButton> cardList = [];
+      for (var item in dataList) {
+        int orderId = item['order_Id'];
+        String deliveryTime = item['deliveryTime'];
+        String customerName = item['user_name'];
+        // String customerPhone = item['user_phoneNumber'];
+        String customerAddress = item['user_address'];
+        String orderAddress = item['merchant_address'];
+        List<FoodItem> foodItems = [];
+        for (var food in item['orderList']) {
+          foodItems.add(FoodItem(food['dish_name'], food['dish_num']));
+        }
+        cardList.add(OrderCardWithButton(
+          orderId: orderId,
+          deliveryTime: deliveryTime,
+          customerName: customerName,
+          customerAddress: customerAddress,
+          orderAddress: orderAddress,
+          frontButtonText: '接单',
+          rearButtonText: '取消',
+          foodItems: foodItems,
+        ));
+      }
+      setState(() {
+        orders = cardList;
+      });
+
+    }
+  }
+
+  void regetData() async {
+    String? phone = await secureStorage.read(key: 'phone');
+    int status = 1;
+    DateTime now = DateTime.now();
+    DateTime start;
+    String like = _searchController.text;
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    if (phone == null) {
+      // 如果没有存储手机号，即表示未登录，跳转到欢迎页面
+      await Get.offAll(() => const WelcomePage());
+      return;
+    }
+
+    switch (_selectedDate) {
+      case '今日':
+        start = DateTime(now.year, now.month, now.day);
+        break;
+      case '近7天':
+        start = now.subtract(const Duration(days: 7));
+        break;
+      case '近30天':
+        start = now.subtract(const Duration(days: 30));
+        break;
+      case '今年':
+        start = DateTime(now.year, 1, 1);
+        break;
+      default:
+        start = DateTime(now.year, now.month, now.day);  
+    }
+
+    Map<String, dynamic> result = await apiService.getOrders(phone, start, now, status, like, context);
+    
+    if (result['code'] == 401) {
+      Map<String, dynamic> refreshData = await apiService.refreshAccessToken(context);
+      if (refreshData['code'] == 409) {
+        // 如果refreshToken也过期了，要求重新登录
+        await secureStorage.deleteAll();
+        await prefs.setBool('Login_Status', false);
+        Get.offAll(() => const WelcomePage());
+        return;
+      }
+      if (refreshData['code'] == 1) {
+        secureStorage.write(key: 'accessToken', value: refreshData['data']['accessToken']);
+        secureStorage.write(key: 'refreshToken', value: refreshData['data']['refreshToken']);
+      }
+      regetData();
+      return;
+    }
+
+    if (result['code'] == 1) {
+      List<dynamic> dataList = result['data'];
+      List<OrderCardWithButton> cardList = [];
+      for (var item in dataList) {
+        int orderId = item['order_Id'];
+        String deliveryTime = item['deliveryTime'];
+        String customerName = item['user_name'];
+        // String customerPhone = item['user_phoneNumber'];
+        String customerAddress = item['user_address'];
+        String orderAddress = item['merchant_address'];
+        List<FoodItem> foodItems = [];
+        for (var food in item['orderList']) {
+          foodItems.add(FoodItem(food['dish_name'], food['dish_num']));
+        }
+        cardList.add(OrderCardWithButton(
+          orderId: orderId,
+          deliveryTime: deliveryTime,
+          customerName: customerName,
+          customerAddress: customerAddress,
+          orderAddress: orderAddress,
+          frontButtonText: '接单',
+          rearButtonText: '取消',
+          foodItems: foodItems,
+        ));
+      }
+      setState(() {
+        orders = cardList;
+      });
+
+    }
+
+  }
 
   @override
   bool get wantKeepAlive => true; // 确保页面在切换时保持活动状态
@@ -35,18 +192,19 @@ class _OrderPendingPageState extends State<OrderPendingPage> with AutomaticKeepA
             children: [
               DropdownButton<String>(
                 value: _selectedDate, // 默认显示"今日"
-                items: <String>['今日', '明日'].map((String value) {
+                items: <String>['今日', '近7天', '近30天', '今年'].map((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
                     child: Text(value),
                   );
                 }).toList(),
                 onChanged: (value) {
-                  // 这里可以实现下拉框选择后的逻辑
-                  // TODO: 发出网络请求更新页面订单内容，然后刷新页面
+                  // 实现下拉框选择后的逻辑
                   setState(() {
                     _selectedDate = value!;
+                    regetData();
                   });
+                  
                 },
               ),
               const Spacer(),
@@ -60,9 +218,12 @@ class _OrderPendingPageState extends State<OrderPendingPage> with AutomaticKeepA
                 ),
                 child: Row(
                   children: [
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Icon(Icons.search),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: GestureDetector(
+                        onTap: regetData,
+                        child: const Icon(Icons.search),
+                      )
                     ),
                     Expanded(
                       child: TextField(
@@ -70,9 +231,7 @@ class _OrderPendingPageState extends State<OrderPendingPage> with AutomaticKeepA
                           border: InputBorder.none,
                           hintText: '搜索订单',
                         ),
-                        onChanged: (value) {
-                          // TODO:这里可以实现搜索逻辑
-                        },
+                        controller: _searchController,
                       ),
                     ),
                   ],
@@ -110,6 +269,8 @@ class _OrderPendingPageState extends State<OrderPendingPage> with AutomaticKeepA
                   rearButtonText: '取消',
                   foodItems: [
                     FoodItem('好大的乳山生蚝', 12),
+                    FoodItem('干拌粉', 2),
+                    FoodItem('干拌粉', 2),
                     FoodItem('干拌粉', 2),
                   ],
                 ),

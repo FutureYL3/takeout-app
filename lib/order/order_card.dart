@@ -1,16 +1,39 @@
 import 'package:flutter/material.dart';
 
-class OrderCardWithButton extends StatelessWidget {
+class OrderCardWithButton extends StatefulWidget {
   final int? orderId;
   final String? deliveryTime;
   final String? customerName;
+  final String? customerPhone;
   final String? customerAddress;
   final String? orderAddress;
   final String? frontButtonText;
   final String? rearButtonText;
   final List<FoodItem>? foodItems;
 
-  const OrderCardWithButton({super.key, this.orderId, this.deliveryTime, this.customerName, this.customerAddress, this.orderAddress, this.frontButtonText, this.rearButtonText, this.foodItems});
+  const OrderCardWithButton({super.key, this.orderId, this.deliveryTime, this.customerName, this.customerPhone, this.customerAddress, this.orderAddress, this.frontButtonText, this.rearButtonText, this.foodItems});
+
+
+  @override
+  State<StatefulWidget> createState() => _OrderCardWithButtonState();
+}
+
+class _OrderCardWithButtonState extends State<OrderCardWithButton> {
+  bool isExpanded = false; // 控制卡片是否展开
+
+  Widget _buildFoodItems(List<FoodItem> items) {
+    return Column(
+      children: items.map((item) {
+        return Row(
+          children: [
+            Text(item.name),
+            const Spacer(),
+            Text('x${item.count}'),
+          ],
+        );
+      }).toList(),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,14 +48,14 @@ class OrderCardWithButton extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  orderId.toString(),
+                  widget.orderId.toString(),
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(width: 10),
-                Text(deliveryTime!),
+                Text(widget.deliveryTime!),
                 const Spacer(),
                 Row(
                   children: [
@@ -43,7 +66,7 @@ class OrderCardWithButton extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                         minimumSize: const Size(60, 30),
                       ),
-                      child: Text(frontButtonText!),
+                      child: Text(widget.frontButtonText!),
                     ),
                     const SizedBox(width: 10),
                     ElevatedButton(
@@ -53,36 +76,42 @@ class OrderCardWithButton extends StatelessWidget {
                       style: OutlinedButton.styleFrom(
                         minimumSize: const Size(60, 30),
                       ),
-                      child: Text(rearButtonText!),
+                      child: Text(widget.rearButtonText!),
                     ),
                   ],
                 )
               ],
             ),
             const SizedBox(height: 8),
-            Text(customerAddress!),
+            Text(widget.customerAddress!),
             const SizedBox(height: 4),
             Text(
-              orderAddress!,
+              widget.orderAddress!,
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            Column(
-              children: foodItems!.take(2).map((item) =>
-                Row(
-                  children: [
-                    Text(item.name),
-                    const Spacer(),
-                    Text('x${item.count}'),
-                  ],
-                )
-              ).toList(),
+            // 使用 AnimatedCrossFade 实现展开和折叠动画
+            AnimatedCrossFade(
+              duration: const Duration(milliseconds: 100),
+              firstChild: _buildFoodItems(widget.foodItems!.take(2).toList()), // 折叠时只显示前两个
+              secondChild: _buildFoodItems(widget.foodItems!), // 展开时显示全部
+              crossFadeState: isExpanded
+                  ? CrossFadeState.showSecond
+                  : CrossFadeState.showFirst,
             ),
             const SizedBox(height: 4),
-            // TODO: 点击后展示全部订单内容
-            const Align(
+            Align(
               alignment: Alignment.center,
-              child: Icon(Icons.expand_more),
+              child: IconButton(
+                icon: Icon(
+                  isExpanded ? Icons.expand_less : Icons.expand_more,
+                ),
+                onPressed: () {
+                  setState(() {
+                    isExpanded = !isExpanded; // 切换展开状态
+                  });
+                },
+              ),
             ),
           ],
         ),
@@ -91,7 +120,7 @@ class OrderCardWithButton extends StatelessWidget {
   }
 }
 
-class OrderCardWithoutButton extends StatelessWidget {
+class OrderCardWithoutButton extends StatefulWidget {
   final int? orderId;
   final String? deliveryTime;
   final String? customerName;
@@ -102,6 +131,27 @@ class OrderCardWithoutButton extends StatelessWidget {
   final List<FoodItem>? foodItems;
 
   const OrderCardWithoutButton({super.key, this.orderId, this.deliveryTime, this.customerName, this.customerAddress, this.orderAddress, this.completeTime, this.hintText, this.foodItems});
+  
+  @override
+  State<StatefulWidget> createState() => _OrderCardWithoutButtonState();
+}
+
+class _OrderCardWithoutButtonState extends State<OrderCardWithoutButton> {
+  bool isExpanded = false; // 控制卡片是否展开
+
+  Widget _buildFoodItems(List<FoodItem> items) {
+    return Column(
+      children: items.map((item) {
+        return Row(
+          children: [
+            Text(item.name),
+            const Spacer(),
+            Text('x${item.count}'),
+          ],
+        );
+      }).toList(),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -116,43 +166,49 @@ class OrderCardWithoutButton extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  orderId.toString(),
+                  widget.orderId.toString(),
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(width: 10),
-                Text(deliveryTime!),
+                Text(widget.deliveryTime!),
                 const Spacer(),
-                Text(completeTime ?? ''),
-                Text(hintText!)
+                Text(widget.completeTime ?? ''),
+                Text(widget.hintText!)
               ],
             ),
             const SizedBox(height: 8),
-            Text(customerAddress!),
+            Text(widget.customerAddress!),
             const SizedBox(height: 4),
             Text(
-              orderAddress!,
+              widget.orderAddress!,
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            Column(
-              children: foodItems!.take(2).map((item) =>
-                Row(
-                  children: [
-                    Text(item.name),
-                    const Spacer(),
-                    Text('x${item.count}'),
-                  ],
-                )
-              ).toList(),
+            // 使用 AnimatedCrossFade 实现展开和折叠动画
+            AnimatedCrossFade(
+              duration: const Duration(milliseconds: 100),
+              firstChild: _buildFoodItems(widget.foodItems!.take(2).toList()), // 折叠时只显示前两个
+              secondChild: _buildFoodItems(widget.foodItems!), // 展开时显示全部
+              crossFadeState: isExpanded
+                  ? CrossFadeState.showSecond
+                  : CrossFadeState.showFirst,
             ),
             const SizedBox(height: 4),
-            // TODO: 点击后展示全部订单内容
-            const Align(
+            Align(
               alignment: Alignment.center,
-              child: Icon(Icons.expand_more),
+              child: IconButton(
+                icon: Icon(
+                  isExpanded ? Icons.expand_less : Icons.expand_more,
+                ),
+                onPressed: () {
+                  setState(() {
+                    isExpanded = !isExpanded; // 切换展开状态
+                  });
+                },
+              ),
             ),
           ],
         ),

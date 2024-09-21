@@ -53,7 +53,9 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
         secureStorage.write(key: 'refreshToken', value: refreshData['data']['refreshToken']);
       }
       getData();
+      return;
     }
+    
     if (response['code'] == 1) {
       setState(() {
         idCardNumber  = response['data']['id_card_number'];
