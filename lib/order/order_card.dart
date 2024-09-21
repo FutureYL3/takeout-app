@@ -1,17 +1,24 @@
 import 'package:flutter/material.dart';
 
-class OrderCardWithButton extends StatefulWidget {
-  final int? orderId;
-  final String? deliveryTime;
-  final String? customerName;
-  final String? customerPhone;
-  final String? customerAddress;
-  final String? orderAddress;
-  final String? frontButtonText;
-  final String? rearButtonText;
-  final List<FoodItem>? foodItems;
+import 'order_model.dart';
 
-  const OrderCardWithButton({super.key, this.orderId, this.deliveryTime, this.customerName, this.customerPhone, this.customerAddress, this.orderAddress, this.frontButtonText, this.rearButtonText, this.foodItems});
+// ignore: must_be_immutable
+class OrderCardWithButton extends StatefulWidget {
+  final int orderId;
+  final String deliveryTime;
+  final String customerName;
+  final String customerPhone;
+  final String customerAddress;
+  final String orderAddress;
+  final String frontButtonText;
+  final String rearButtonText;
+  final List<FoodItem> foodItems;
+  final VoidCallback onFrontButtonPressed;
+  final VoidCallback onRearButtonPressed;
+
+  int status = -1;
+
+  OrderCardWithButton({super.key, required this.orderId, required this.deliveryTime, required this.customerName, required this.customerPhone, required this.customerAddress, required this.orderAddress, required this.frontButtonText, required this.rearButtonText, required this.foodItems, required this.status, required this.onFrontButtonPressed, required this.onRearButtonPressed,});
 
 
   @override
@@ -55,46 +62,42 @@ class _OrderCardWithButtonState extends State<OrderCardWithButton> {
                   ),
                 ),
                 const SizedBox(width: 10),
-                Text(widget.deliveryTime!),
+                Text(widget.deliveryTime),
                 const Spacer(),
                 Row(
                   children: [
                     ElevatedButton(
-                      onPressed: () {
-                        // TODO: 根据按钮的不同，实现不同的逻辑
-                      },
+                      onPressed: widget.onFrontButtonPressed,
                       style: ElevatedButton.styleFrom(
                         minimumSize: const Size(60, 30),
                       ),
-                      child: Text(widget.frontButtonText!),
+                      child: Text(widget.frontButtonText),
                     ),
                     const SizedBox(width: 10),
                     ElevatedButton(
-                      onPressed: () {
-                        // TODO: 根据按钮的不同，实现不同的逻辑
-                      },
+                      onPressed: widget.onRearButtonPressed,
                       style: OutlinedButton.styleFrom(
                         minimumSize: const Size(60, 30),
                       ),
-                      child: Text(widget.rearButtonText!),
+                      child: Text(widget.rearButtonText),
                     ),
                   ],
                 )
               ],
             ),
             const SizedBox(height: 8),
-            Text(widget.customerAddress!),
+            Text(widget.customerAddress),
             const SizedBox(height: 4),
             Text(
-              widget.orderAddress!,
+              widget.orderAddress,
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             // 使用 AnimatedCrossFade 实现展开和折叠动画
             AnimatedCrossFade(
               duration: const Duration(milliseconds: 100),
-              firstChild: _buildFoodItems(widget.foodItems!.take(2).toList()), // 折叠时只显示前两个
-              secondChild: _buildFoodItems(widget.foodItems!), // 展开时显示全部
+              firstChild: _buildFoodItems(widget.foodItems.take(2).toList()), // 折叠时只显示前两个
+              secondChild: _buildFoodItems(widget.foodItems), // 展开时显示全部
               crossFadeState: isExpanded
                   ? CrossFadeState.showSecond
                   : CrossFadeState.showFirst,
@@ -120,17 +123,20 @@ class _OrderCardWithButtonState extends State<OrderCardWithButton> {
   }
 }
 
+// ignore: must_be_immutable
 class OrderCardWithoutButton extends StatefulWidget {
-  final int? orderId;
-  final String? deliveryTime;
-  final String? customerName;
-  final String? customerAddress;
-  final String? orderAddress;
+  final int orderId;
+  final String deliveryTime;
+  final String customerName;
+  final String customerAddress;
+  final String orderAddress;
   final String? completeTime;
-  final String? hintText;
-  final List<FoodItem>? foodItems;
+  final String hintText;
+  final List<FoodItem> foodItems;
 
-  const OrderCardWithoutButton({super.key, this.orderId, this.deliveryTime, this.customerName, this.customerAddress, this.orderAddress, this.completeTime, this.hintText, this.foodItems});
+  int status = -1;
+
+  OrderCardWithoutButton({super.key, required this.orderId, required this.deliveryTime, required this.customerName, required this.customerAddress, required this.orderAddress, this.completeTime, required this.hintText, required this.foodItems, required this.status});
   
   @override
   State<StatefulWidget> createState() => _OrderCardWithoutButtonState();
@@ -173,25 +179,25 @@ class _OrderCardWithoutButtonState extends State<OrderCardWithoutButton> {
                   ),
                 ),
                 const SizedBox(width: 10),
-                Text(widget.deliveryTime!),
+                Text(widget.deliveryTime),
                 const Spacer(),
                 Text(widget.completeTime ?? ''),
-                Text(widget.hintText!)
+                Text(widget.hintText)
               ],
             ),
             const SizedBox(height: 8),
-            Text(widget.customerAddress!),
+            Text(widget.customerAddress),
             const SizedBox(height: 4),
             Text(
-              widget.orderAddress!,
+              widget.orderAddress,
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             // 使用 AnimatedCrossFade 实现展开和折叠动画
             AnimatedCrossFade(
               duration: const Duration(milliseconds: 100),
-              firstChild: _buildFoodItems(widget.foodItems!.take(2).toList()), // 折叠时只显示前两个
-              secondChild: _buildFoodItems(widget.foodItems!), // 展开时显示全部
+              firstChild: _buildFoodItems(widget.foodItems.take(2).toList()), // 折叠时只显示前两个
+              secondChild: _buildFoodItems(widget.foodItems), // 展开时显示全部
               crossFadeState: isExpanded
                   ? CrossFadeState.showSecond
                   : CrossFadeState.showFirst,
@@ -215,11 +221,4 @@ class _OrderCardWithoutButtonState extends State<OrderCardWithoutButton> {
       ),
     );
   }
-}
-
-class FoodItem {
-  final String name;
-  final int count;
-
-  const FoodItem(this.name, this.count);
 }

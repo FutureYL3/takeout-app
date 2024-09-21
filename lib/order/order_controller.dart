@@ -1,0 +1,349 @@
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:takeout/order/order_managing_apis.dart';
+import 'package:takeout/utils/common_utils.dart';
+import '../welcome/welcome_page.dart';
+import './order_model.dart';
+
+class OrderController extends GetxController {
+  final OrderManagingApiService apiService = OrderManagingApiService();
+  final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+
+  // 集中管理所有状态的订单
+  var pendingOrders = <Order>[].obs;
+  var acceptedOrders = <Order>[].obs;
+  var deliveryingOrders = <Order>[].obs;
+  var completedOrders = <Order>[].obs;
+  var cancelledOrders = <Order>[].obs;
+
+  // 从API获取订单数据
+  Future<void> fetchPendingOrders(DateTime start, DateTime end, String? like, BuildContext ctx) async {
+    // 实现API调用，获取订单数据并赋值给pendingOrders
+    String? phone = await secureStorage.read(key: 'phone');
+    int status = 1;
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    if (phone == null) {
+      // 如果没有存储手机号，即表示未登录，跳转到欢迎页面
+      await Get.offAll(() => const WelcomePage());
+      return;
+    }
+    
+    Map<String, dynamic> result = await apiService.getOrders(phone, start, end, status, like, ctx);
+
+    if (result['code'] == 401) {
+      Map<String, dynamic> refreshData = await apiService.refreshAccessToken(ctx);
+      if (refreshData['code'] == 409) {
+        // 如果refreshToken也过期了，要求重新登录
+        await secureStorage.deleteAll();
+        await prefs.setBool('Login_Status', false);
+        Get.offAll(() => const WelcomePage());
+        return;
+      }
+      if (refreshData['code'] == 1) {
+        secureStorage.write(key: 'accessToken', value: refreshData['data']['accessToken']);
+        secureStorage.write(key: 'refreshToken', value: refreshData['data']['refreshToken']);
+      }
+      fetchPendingOrders(start, end, like, ctx); // 重新获取数据
+      return;
+    }
+
+    if (result['code'] == 1) {
+      pendingOrders.clear();
+      for (var order in result['data']) {
+        pendingOrders.add(Order(
+          orderId: order['order_id'],
+          deliveryTime: order['deliveryTime'],
+          customerName: order['user_name'],
+          customerPhone: order['user_phoneNumber'],
+          customerAddress: order['user_address'],
+          orderAddress: order['merchant_address'],
+          foodItems: (order['orderList'] as List).map((item) => FoodItem(item['dish_name'], item['dish_num'])).toList(),
+          status: status,
+          completeTime: order['completeTime'] ?? '', // TODO: 与后端沟通
+        ));
+      }
+      pendingOrders.refresh(); // 通知监听者
+    }
+  }
+
+  // 从API获取订单数据
+  Future<void> fetchAcceptedOrders(DateTime start, DateTime end, String? like, BuildContext ctx) async {
+    // 实现API调用，获取订单数据并赋值给acceptedOrders
+    String? phone = await secureStorage.read(key: 'phone');
+    int status = 2;
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    if (phone == null) {
+      // 如果没有存储手机号，即表示未登录，跳转到欢迎页面
+      await Get.offAll(() => const WelcomePage());
+      return;
+    }
+    
+    Map<String, dynamic> result = await apiService.getOrders(phone, start, end, status, like, ctx);
+
+    if (result['code'] == 401) {
+      Map<String, dynamic> refreshData = await apiService.refreshAccessToken(ctx);
+      if (refreshData['code'] == 409) {
+        // 如果refreshToken也过期了，要求重新登录
+        await secureStorage.deleteAll();
+        await prefs.setBool('Login_Status', false);
+        Get.offAll(() => const WelcomePage());
+        return;
+      }
+      if (refreshData['code'] == 1) {
+        secureStorage.write(key: 'accessToken', value: refreshData['data']['accessToken']);
+        secureStorage.write(key: 'refreshToken', value: refreshData['data']['refreshToken']);
+      }
+      fetchAcceptedOrders(start, end, like, ctx); // 重新获取数据
+      return;
+    }
+
+    if (result['code'] == 1) {
+      acceptedOrders.clear();
+      for (var order in result['data']) {
+        acceptedOrders.add(Order(
+          orderId: order['order_id'],
+          deliveryTime: order['deliveryTime'],
+          customerName: order['user_name'],
+          customerPhone: order['user_phoneNumber'],
+          customerAddress: order['user_address'],
+          orderAddress: order['merchant_address'],
+          foodItems: (order['orderList'] as List).map((item) => FoodItem(item['dish_name'], item['dish_num'])).toList(),
+          status: status,
+          completeTime: order['completeTime'] ?? '', // TODO: 与后端沟通
+        ));
+      }
+      acceptedOrders.refresh(); // 通知监听者
+    }
+    
+  }
+
+  // 从API获取订单数据
+  Future<void> fetchDeliveryingOrders(DateTime start, DateTime end, String? like, BuildContext ctx) async {
+    // 实现API调用，获取订单数据并赋值给deliveryingOrders
+    String? phone = await secureStorage.read(key: 'phone');
+    int status = 3;
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    if (phone == null) {
+      // 如果没有存储手机号，即表示未登录，跳转到欢迎页面
+      await Get.offAll(() => const WelcomePage());
+      return;
+    }
+    
+    Map<String, dynamic> result = await apiService.getOrders(phone, start, end, status, like, ctx);
+
+    if (result['code'] == 401) {
+      Map<String, dynamic> refreshData = await apiService.refreshAccessToken(ctx);
+      if (refreshData['code'] == 409) {
+        // 如果refreshToken也过期了，要求重新登录
+        await secureStorage.deleteAll();
+        await prefs.setBool('Login_Status', false);
+        Get.offAll(() => const WelcomePage());
+        return;
+      }
+      if (refreshData['code'] == 1) {
+        secureStorage.write(key: 'accessToken', value: refreshData['data']['accessToken']);
+        secureStorage.write(key: 'refreshToken', value: refreshData['data']['refreshToken']);
+      }
+      fetchDeliveryingOrders(start, end, like, ctx); // 重新获取数据
+      return;
+    }
+
+    if (result['code'] == 1) {
+      deliveryingOrders.clear();
+      for (var order in result['data']) {
+        deliveryingOrders.add(Order(
+          orderId: order['order_id'],
+          deliveryTime: order['deliveryTime'],
+          customerName: order['user_name'],
+          customerPhone: order['user_phoneNumber'],
+          customerAddress: order['user_address'],
+          orderAddress: order['merchant_address'],
+          foodItems: (order['orderList'] as List).map((item) => FoodItem(item['dish_name'], item['dish_num'])).toList(),
+          status: status,
+          completeTime: order['completeTime'] ?? '', // TODO: 与后端沟通
+        ));
+      }
+      deliveryingOrders.refresh(); // 通知监听者
+    }
+    
+  }
+
+  // 从API获取订单数据
+  Future<void> fetchCompletedOrders(DateTime start, DateTime end, String? like, BuildContext ctx) async {
+    // 实现API调用，获取订单数据并赋值给deliveryingOrders
+    String? phone = await secureStorage.read(key: 'phone');
+    int status = 4;
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    if (phone == null) {
+      // 如果没有存储手机号，即表示未登录，跳转到欢迎页面
+      await Get.offAll(() => const WelcomePage());
+      return;
+    }
+    
+    Map<String, dynamic> result = await apiService.getOrders(phone, start, end, status, like, ctx);
+
+    if (result['code'] == 401) {
+      Map<String, dynamic> refreshData = await apiService.refreshAccessToken(ctx);
+      if (refreshData['code'] == 409) {
+        // 如果refreshToken也过期了，要求重新登录
+        await secureStorage.deleteAll();
+        await prefs.setBool('Login_Status', false);
+        Get.offAll(() => const WelcomePage());
+        return;
+      }
+      if (refreshData['code'] == 1) {
+        secureStorage.write(key: 'accessToken', value: refreshData['data']['accessToken']);
+        secureStorage.write(key: 'refreshToken', value: refreshData['data']['refreshToken']);
+      }
+      fetchCompletedOrders(start, end, like, ctx); // 重新获取数据
+      return;
+    }
+
+    if (result['code'] == 1) {
+      completedOrders.clear();
+      for (var order in result['data']) {
+        completedOrders.add(Order(
+          orderId: order['order_id'],
+          deliveryTime: order['deliveryTime'],
+          customerName: order['user_name'],
+          customerPhone: order['user_phoneNumber'],
+          customerAddress: order['user_address'],
+          orderAddress: order['merchant_address'],
+          foodItems: (order['orderList'] as List).map((item) => FoodItem(item['dish_name'], item['dish_num'])).toList(),
+          status: status,
+          completeTime: order['completeTime'] ?? '', // TODO: 与后端沟通
+        ));
+      }
+      completedOrders.refresh(); // 通知监听者
+    }
+    
+  }
+
+  // 从API获取订单数据
+  Future<void> fetchCancelledOrders(DateTime start, DateTime end, String? like, BuildContext ctx) async {
+    // 实现API调用，获取订单数据并赋值给deliveryingOrders
+    String? phone = await secureStorage.read(key: 'phone');
+    int status = 5;
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    if (phone == null) {
+      // 如果没有存储手机号，即表示未登录，跳转到欢迎页面
+      await Get.offAll(() => const WelcomePage());
+      return;
+    }
+    
+    Map<String, dynamic> result = await apiService.getOrders(phone, start, end, status, like, ctx);
+
+    if (result['code'] == 401) {
+      Map<String, dynamic> refreshData = await apiService.refreshAccessToken(ctx);
+      if (refreshData['code'] == 409) {
+        // 如果refreshToken也过期了，要求重新登录
+        await secureStorage.deleteAll();
+        await prefs.setBool('Login_Status', false);
+        Get.offAll(() => const WelcomePage());
+        return;
+      }
+      if (refreshData['code'] == 1) {
+        secureStorage.write(key: 'accessToken', value: refreshData['data']['accessToken']);
+        secureStorage.write(key: 'refreshToken', value: refreshData['data']['refreshToken']);
+      }
+      fetchCancelledOrders(start, end, like, ctx); // 重新获取数据
+      return;
+    }
+
+    if (result['code'] == 1) {
+      cancelledOrders.clear();
+      for (var order in result['data']) {
+        cancelledOrders.add(Order(
+          orderId: order['order_id'],
+          deliveryTime: order['deliveryTime'],
+          customerName: order['user_name'],
+          customerPhone: order['user_phoneNumber'],
+          customerAddress: order['user_address'],
+          orderAddress: order['merchant_address'],
+          foodItems: (order['orderList'] as List).map((item) => FoodItem(item['dish_name'], item['dish_num'])).toList(),
+          status: status,
+          completeTime: order['completeTime'] ?? '', // TODO: 与后端沟通
+        ));
+      }
+      cancelledOrders.refresh(); // 通知监听者
+    }
+    
+  }
+
+  // 根据订单ID更新订单状态，并可选择是否同步更新服务器
+  Future<void> updateOrderStatus(RxList<Order> originList, int orderId, int newStatus, BuildContext ctx) async {
+    // 找到对应的订单
+    int index = originList.indexWhere((order) => order.orderId == orderId);
+
+    if (index == -1) {
+      showSnackBar('未知错误', '请稍候重试', ContentType.failure, ctx);
+      return;
+    }
+
+    String? phone = await secureStorage.read(key: 'phone');
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    if (phone == null) {
+      // 如果没有存储手机号，即表示未登录，跳转到欢迎页面
+      await Get.offAll(() => const WelcomePage());
+      return;
+    }
+
+    Map<String, dynamic> result = await apiService.updateOrders(phone, orderId, newStatus, ctx);
+
+    if (result['code'] == 401) {
+      Map<String, dynamic> refreshData = await apiService.refreshAccessToken(ctx);
+      if (refreshData['code'] == 409) {
+        // 如果refreshToken也过期了，要求重新登录
+        await secureStorage.deleteAll();
+        await prefs.setBool('Login_Status', false);
+        Get.offAll(() => const WelcomePage());
+        return;
+      }
+      if (refreshData['code'] == 1) {
+        secureStorage.write(key: 'accessToken', value: refreshData['data']['accessToken']);
+        secureStorage.write(key: 'refreshToken', value: refreshData['data']['refreshToken']);
+      }
+      updateOrderStatus(originList, orderId, newStatus, ctx); // 重新尝试更新
+      return;
+    }
+
+
+    if (result['code'] == 1) {
+      // 更新本地状态
+      Order order = originList[index];
+      originList.removeAt(index);
+      RxList<Order> targetList = <Order>[].obs;
+      switch (newStatus) {
+        case 1:
+          targetList = pendingOrders;
+          break;
+        case 2:
+          targetList = acceptedOrders;
+          break;
+        case 3:
+          targetList = deliveryingOrders;
+          break;
+        case 4:
+          targetList = completedOrders;
+          break;
+        case 5:
+          targetList = cancelledOrders;
+          break;
+        default:
+          break;
+      }
+      targetList.add(order);
+      originList.refresh(); // 通知监听者
+      targetList.refresh(); // 通知监听者
+    }
+  }
+}

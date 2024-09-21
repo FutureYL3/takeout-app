@@ -114,6 +114,7 @@ class _OrderManagingPageState extends State<OrderManagingPage> {
     );
   }
 
+
   /// 通过懒加载来构建页面，只有在用户点击菜单时才加载页面
   Widget _buildPageContent(int index) {
     if (_loadedPages.containsKey(index)) {

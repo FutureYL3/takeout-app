@@ -99,7 +99,6 @@ class OrderManagingApiService {
 
   Future<Map<String, dynamic>> updateOrders(String phone, int orderId, int updatedStatus, BuildContext ctx) async {
     try {
-      
       Response response = await dio.put('/courier/orderUpdate', data: {
         'phoneNumber': phone,
         'order_id': orderId,

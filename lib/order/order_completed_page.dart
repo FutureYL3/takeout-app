@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:takeout/order/order_card.dart';
+
+import 'order_controller.dart';
 
 class OrderCompletedPage extends StatefulWidget {
   const OrderCompletedPage({super.key});
@@ -11,13 +14,57 @@ class OrderCompletedPage extends StatefulWidget {
 class _OrderCompletedPageState extends State<OrderCompletedPage> with AutomaticKeepAliveClientMixin {
   String _selectedDate = '今日';
   String? like;
-  List<OrderCardWithButton>? orders;
+  // List<OrderCardWithButton>? orders;
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    // TODO: 发出网络请求获取订单
+    
+    // getData();
   }
+
+  void getData() async {
+    // String? phone = await secureStorage.read(key: 'phone');
+    // int status = 1;
+    // 初次加载时默认显示今日订单
+    DateTime now = DateTime.now();
+    DateTime start = DateTime(now.year, now.month, now.day);
+    // final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final OrderController orderController = Get.find<OrderController>();
+
+    orderController.fetchCompletedOrders(start, now, null, context);
+  }
+
+  void regetData() async {
+    // String? phone = await secureStorage.read(key: 'phone');
+    // int status = 1;
+    DateTime now = DateTime.now();
+    DateTime start;
+    String like = _searchController.text;
+    // final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final OrderController orderController = Get.find<OrderController>();
+
+    switch (_selectedDate) {
+      case '今日':
+        start = DateTime(now.year, now.month, now.day);
+        break;
+      case '近7天':
+        start = now.subtract(const Duration(days: 7));
+        break;
+      case '近30天':
+        start = now.subtract(const Duration(days: 30));
+        break;
+      case '今年':
+        start = DateTime(now.year, 1, 1);
+        break;
+      default:
+        start = DateTime(now.year, now.month, now.day);  
+    }
+
+    orderController.fetchCompletedOrders(start, now, like, context);
+
+  }  
 
 
   @override
@@ -35,17 +82,17 @@ class _OrderCompletedPageState extends State<OrderCompletedPage> with AutomaticK
             children: [
               DropdownButton<String>(
                 value: _selectedDate, // 默认显示"今日"
-                items: <String>['今日', '明日'].map((String value) {
+                items: <String>['今日', '近7天', '近30天', '今年'].map((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
                     child: Text(value),
                   );
                 }).toList(),
                 onChanged: (value) {
-                  // 这里可以实现下拉框选择后的逻辑
-                  // TODO: 发出网络请求更新页面订单内容，然后刷新页面
+                  // 实现下拉框选择后的逻辑
                   setState(() {
                     _selectedDate = value!;
+                    //TODO regetData();
                   });
                 },
               ),
@@ -60,9 +107,12 @@ class _OrderCompletedPageState extends State<OrderCompletedPage> with AutomaticK
                 ),
                 child: Row(
                   children: [
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Icon(Icons.search),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: GestureDetector(
+                        onTap: (){},//TODO regetData, 
+                        child: const Icon(Icons.search),
+                      )
                     ),
                     Expanded(
                       child: TextField(
@@ -70,9 +120,7 @@ class _OrderCompletedPageState extends State<OrderCompletedPage> with AutomaticK
                           border: InputBorder.none,
                           hintText: '搜索订单',
                         ),
-                        onChanged: (value) {
-                          // TODO:这里可以实现搜索逻辑
-                        },
+                        controller: _searchController,
                       ),
                     ),
                   ],
@@ -83,53 +131,88 @@ class _OrderCompletedPageState extends State<OrderCompletedPage> with AutomaticK
           const SizedBox(height: 20),
 
           // 订单卡片列表
+          // 使用 Obx 监听订单列表的变化
           Expanded(
-            child: ListView(
-              children: const [
-                OrderCardWithoutButton(
-                  orderId: 12,
-                  deliveryTime: '12:00',
-                  customerName: '王先生',
-                  customerAddress: '家属四公寓-1201',
-                  orderAddress: 'xxxxxxxxxxxxxxxxx',
-                  completeTime: '11:57',
-                  hintText: '已送达',
-                  foodItems: [
-                    FoodItem('鱼香肉丝', 1),
-                    FoodItem('宫保鸡丁', 2),
-                  ],
-                ),
-                // SizedBox(height: 10),
-                OrderCardWithoutButton(
-                  orderId: 13,
-                  deliveryTime: '12:00',
-                  customerName: '赵女士',
-                  customerAddress: '家属四公寓-1301',
-                  orderAddress: 'xxxxxxxxxxxxxxxxx',
-                  completeTime: '11:57',
-                  hintText: '已送达',
-                  foodItems: [
-                    FoodItem('好大的乳山生蚝', 12),
-                    FoodItem('干拌粉', 2),
-                  ],
-                ),
-                // SizedBox(height: 10),
-                OrderCardWithoutButton(
-                  orderId: 14,
-                  deliveryTime: '12:00',
-                  customerName: '刘先生',
-                  customerAddress: '家属四公寓-1401',
-                  orderAddress: 'xxxxxxxxxxxxxxxxx',
-                  completeTime: '11:57',
-                  hintText: '已送达',
-                  foodItems: [
-                    FoodItem('烤肉拌饭', 1),
-                    FoodItem('农夫山泉', 2),
-                  ],
-                ),
-              ],
-            ),
+            child: Obx(() {
+              final OrderController orderController = Get.find<OrderController>();
+              // var pendingOrders = [];
+              // pendingOrders.addAll(orderController.pendingOrders);
+
+              if (orderController.completedOrders.isEmpty) {
+                return const Center(child: Text('暂无已完成订单'));
+              }
+
+              return ListView.builder(
+                itemCount: orderController.completedOrders.length,
+                itemBuilder: (context, index) {
+                  var order = orderController.completedOrders[index];
+                  return OrderCardWithoutButton(
+                    orderId: order.orderId,
+                    deliveryTime: order.deliveryTime,
+                    customerName: order.customerName,
+                    customerAddress: order.customerAddress,
+                    orderAddress: order.orderAddress,
+                    hintText: '已送达', 
+                    foodItems: order.foodItems,
+                    completeTime: order.completeTime!, // TODO:后端返回送达时间
+                    status: 4,
+                  );
+                },
+              );
+            }),
           ),
+
+          // 订单卡片列表
+          // Expanded(
+          //   child: ListView(
+          //     children: [
+          //       OrderCardWithoutButton(
+          //         orderId: 12,
+          //         deliveryTime: '12:00',
+          //         customerName: '王先生',
+          //         customerAddress: '家属四公寓-1201',
+          //         orderAddress: 'xxxxxxxxxxxxxxxxx',
+          //         completeTime: '11:57',
+          //         hintText: '已送达',
+          //         foodItems: const [
+          //           FoodItem('鱼香肉丝', 1),
+          //           FoodItem('宫保鸡丁', 2),
+          //         ],
+          //         status: 4,
+          //       ),
+          //       // SizedBox(height: 10),
+          //       OrderCardWithoutButton(
+          //         orderId: 13,
+          //         deliveryTime: '12:00',
+          //         customerName: '赵女士',
+          //         customerAddress: '家属四公寓-1301',
+          //         orderAddress: 'xxxxxxxxxxxxxxxxx',
+          //         completeTime: '11:57',
+          //         hintText: '已送达',
+          //         foodItems: const [
+          //           FoodItem('好大的乳山生蚝', 12),
+          //           FoodItem('干拌粉', 2),
+          //         ],
+          //         status: 4,
+          //       ),
+          //       // SizedBox(height: 10),
+          //       OrderCardWithoutButton(
+          //         orderId: 14,
+          //         deliveryTime: '12:00',
+          //         customerName: '刘先生',
+          //         customerAddress: '家属四公寓-1401',
+          //         orderAddress: 'xxxxxxxxxxxxxxxxx',
+          //         completeTime: '11:57',
+          //         hintText: '已送达',
+          //         foodItems: const [
+          //           FoodItem('烤肉拌饭', 1),
+          //           FoodItem('农夫山泉', 2),
+          //         ],
+          //         status: 4,
+          //       ),
+          //     ],
+          //   ),
+          // ),
         ],
       ),
     );
