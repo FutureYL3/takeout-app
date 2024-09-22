@@ -14,35 +14,28 @@ class OrderCancelledPage extends StatefulWidget {
 class _OrderCancelledPageState extends State<OrderCancelledPage> with AutomaticKeepAliveClientMixin {
   String _selectedDate = '今日';
   String? like;
-  // List<OrderCardWithButton>? orders;
   final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     
-    // getData();
+    getData();
   }
 
   void getData() async {
-    // String? phone = await secureStorage.read(key: 'phone');
-    // int status = 1;
     // 初次加载时默认显示今日订单
     DateTime now = DateTime.now();
     DateTime start = DateTime(now.year, now.month, now.day);
-    // final SharedPreferences prefs = await SharedPreferences.getInstance();
     final OrderController orderController = Get.find<OrderController>();
 
-    orderController.fetchCancelledOrders(start, now, null, context);
+    orderController.fetchCancelledOrders(start, now, null, context, isInitFetch: true);
   }
 
   void regetData() async {
-    // String? phone = await secureStorage.read(key: 'phone');
-    // int status = 1;
     DateTime now = DateTime.now();
     DateTime start;
     String like = _searchController.text;
-    // final SharedPreferences prefs = await SharedPreferences.getInstance();
     final OrderController orderController = Get.find<OrderController>();
 
     switch (_selectedDate) {
@@ -62,7 +55,7 @@ class _OrderCancelledPageState extends State<OrderCancelledPage> with AutomaticK
         start = DateTime(now.year, now.month, now.day);  
     }
 
-    orderController.fetchCancelledOrders(start, now, like, context);
+    orderController.fetchCancelledOrders(start, now, like, context, isInitFetch: false);
 
   }  
 
@@ -92,7 +85,7 @@ class _OrderCancelledPageState extends State<OrderCancelledPage> with AutomaticK
                   // 实现下拉框选择后的逻辑
                   setState(() {
                     _selectedDate = value!;
-                    //TODO regetData();
+                    regetData();
                   });
                 },
               ),
@@ -110,7 +103,7 @@ class _OrderCancelledPageState extends State<OrderCancelledPage> with AutomaticK
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: GestureDetector(
-                        onTap: (){},//TODO regetData, 
+                        onTap: regetData, 
                         child: const Icon(Icons.search),
                       )
                     ),
@@ -135,8 +128,6 @@ class _OrderCancelledPageState extends State<OrderCancelledPage> with AutomaticK
           Expanded(
             child: Obx(() {
               final OrderController orderController = Get.find<OrderController>();
-              // var pendingOrders = [];
-              // pendingOrders.addAll(orderController.pendingOrders);
 
               if (orderController.cancelledOrders.isEmpty) {
                 return const Center(child: Text('暂无已取消订单'));
@@ -160,55 +151,6 @@ class _OrderCancelledPageState extends State<OrderCancelledPage> with AutomaticK
               );
             }),
           ),
-
-          // 订单卡片列表
-          // Expanded(
-          //   child: ListView(
-          //     children: [
-          //       OrderCardWithoutButton(
-          //         orderId: 12,
-          //         deliveryTime: '12:00',
-          //         customerName: '王先生',
-          //         customerAddress: '家属四公寓-1201',
-          //         orderAddress: 'xxxxxxxxxxxxxxxxx',
-          //         hintText: '已取消',
-          //         foodItems: const [
-          //           FoodItem('鱼香肉丝', 1),
-          //           FoodItem('宫保鸡丁', 2),
-          //         ],
-          //         status: 5,
-          //       ),
-          //       // SizedBox(height: 10),
-          //       OrderCardWithoutButton(
-          //         orderId: 13,
-          //         deliveryTime: '12:00',
-          //         customerName: '赵女士',
-          //         customerAddress: '家属四公寓-1301',
-          //         orderAddress: 'xxxxxxxxxxxxxxxxx',
-          //         hintText: '已取消',
-          //         foodItems: const [
-          //           FoodItem('好大的乳山生蚝', 12),
-          //           FoodItem('干拌粉', 2),
-          //         ],
-          //         status: 5,
-          //       ),
-          //       // SizedBox(height: 10),
-          //       OrderCardWithoutButton(
-          //         orderId: 14,
-          //         deliveryTime: '12:00',
-          //         customerName: '刘先生',
-          //         customerAddress: '家属四公寓-1401',
-          //         orderAddress: 'xxxxxxxxxxxxxxxxx',
-          //         hintText: '已取消',
-          //         foodItems: const [
-          //           FoodItem('烤肉拌饭', 1),
-          //           FoodItem('农夫山泉', 2),
-          //         ],
-          //         status: 5,
-          //       ),
-          //     ],
-          //   ),
-          // ),
         ],
       ),
     );

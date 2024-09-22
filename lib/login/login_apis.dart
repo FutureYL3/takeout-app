@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:takeout/utils/common_utils.dart';
 
 class LoginApiService {
-  // static const String baseUrl = 'http://114.55.108.97:8080';
-  static const String baseUrl = 'http://47.99.35.140:8080';
+  static const String baseUrl = 'http://114.55.108.97:8080';
+  // static const String baseUrl = 'http://47.99.35.140:8080';
   late Dio _dio;
 
   LoginApiService() {
