@@ -1,5 +1,5 @@
-name: takeout
-description: "A new Flutter project."
+name: kssdt
+description: "食堂堂食外卖点单小程序《康食速点通》的外卖员专用app，使用者为配送员"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev

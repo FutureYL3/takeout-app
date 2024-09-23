@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:takeout/utils/common_utils.dart';
+
 
 import '../home/home_page.dart';
+import '../utils/common_utils.dart';
 import 'forget_password_page.dart';
 import 'login_apis.dart';
 import 'phone_login_page.dart';

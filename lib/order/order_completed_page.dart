@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:takeout/order/order_card.dart';
 
+import 'order_card.dart';
 import 'order_controller.dart';
 
 class OrderCompletedPage extends StatefulWidget {

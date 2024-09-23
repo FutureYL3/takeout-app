@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:takeout/order/order_managing_apis.dart';
-import 'package:takeout/utils/common_utils.dart';
+import '../utils/common_utils.dart';
 import '../welcome/welcome_page.dart';
 import './order_model.dart';
+import 'order_managing_apis.dart';
 
 class OrderController extends GetxController {
   final OrderManagingApiService apiService = OrderManagingApiService();
@@ -241,7 +241,7 @@ class OrderController extends GetxController {
       deliveryingOrders.clear();
 
       deliveryingOrders
-        ..add(Order(orderId: 1, deliveryTime: "12:00", customerName: '王先生', customerPhone: '18588602616', customerAddress: '八公寓', orderAddress: '学子餐厅', foodItems: [FoodItem('干拌粉', 1), FoodItem('干拌粉', 1), FoodItem('干拌粉', 1), FoodItem('干拌粉', 1)], status: 1))
+        ..add(Order(orderId: 1, deliveryTime: "12:00", customerName: '王先生', customerPhone: '18872333356', customerAddress: '八公寓', orderAddress: '学子餐厅', foodItems: [FoodItem('干拌粉', 1), FoodItem('干拌粉', 1), FoodItem('干拌粉', 1), FoodItem('干拌粉', 1)], status: 1))
         ..add(Order(orderId: 2, deliveryTime: "12:00", customerName: '王先生', customerPhone: '18423129451', customerAddress: '八公寓', orderAddress: '学子餐厅', foodItems: [FoodItem('干拌粉', 1), FoodItem('干拌粉', 1)], status: 1))
         ..add(Order(orderId: 3, deliveryTime: "12:00", customerName: '王先生', customerPhone: '18423129451', customerAddress: '八公寓', orderAddress: '学子餐厅', foodItems: [FoodItem('干拌粉', 1), FoodItem('干拌粉', 1)], status: 1));
 

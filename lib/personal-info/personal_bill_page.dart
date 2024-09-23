@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:takeout/personal-info/personal_info_apis.dart';
+
 
 import '../welcome/welcome_page.dart';
+import 'personal_info_apis.dart';
 
 class BillData {
   final String? orderNumber;

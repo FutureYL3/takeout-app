@@ -1,7 +1,9 @@
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:takeout/utils/common_utils.dart';
+
+import '../utils/common_utils.dart';
+
 
 class LoginApiService {
   static const String baseUrl = 'http://114.55.108.97:8080';

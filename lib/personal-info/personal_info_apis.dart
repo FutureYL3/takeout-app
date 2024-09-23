@@ -7,9 +7,10 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart' hide Response, FormData, MultipartFile;
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:takeout/utils/common_utils.dart';
+
 
 import '../dto/personal_info_dto.dart';
+import '../utils/common_utils.dart';
 import '../welcome/welcome_page.dart';
 
 class PersonalInfoApiService {

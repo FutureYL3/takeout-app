@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:takeout/order/order_accepted_page.dart';
-import 'package:takeout/order/order_cancelled_page.dart';
-import 'package:takeout/order/order_completed_page.dart';
-import 'package:takeout/order/order_delivering_page.dart';
-import 'package:takeout/order/order_pending_page.dart';
+
 
 import '../home/home_page.dart';
 import '../message-notification/msg_notification_page.dart';
 import '../personal-info/personal_center_page.dart';
+import 'order_accepted_page.dart';
+import 'order_cancelled_page.dart';
+import 'order_completed_page.dart';
+import 'order_delivering_page.dart';
+import 'order_pending_page.dart';
 
 class OrderManagingPage extends StatefulWidget {
   const OrderManagingPage({super.key});

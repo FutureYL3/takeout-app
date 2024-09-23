@@ -1,8 +1,9 @@
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:takeout/utils/common_utils.dart';
-import 'package:takeout/welcome/welcome_page.dart';
+
+import '../utils/common_utils.dart';
+import '../welcome/welcome_page.dart';
 import './login_apis.dart';
 
 class ResetPasswordPage extends StatefulWidget {

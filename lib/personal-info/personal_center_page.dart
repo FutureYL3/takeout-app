@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:takeout/personal-info/area_management_page.dart';
 
 import '../home/home_page.dart';
 import '../message-notification/msg_notification_page.dart';
 import '../order/order_managing_page.dart';
 import 'account_management_page.dart';
+import 'area_management_page.dart';
 import 'contact_service_page.dart';
 import 'personal_bill_page.dart';
 import 'personal_info_page.dart';
