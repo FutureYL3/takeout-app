@@ -36,13 +36,13 @@ class _SignUpPageState extends State<SignUpPage> {
     }
     // 发送请求
     Map<String, dynamic> response = await utils.getValidationCode(phoneNumber);
-    if (response['code'] == 1) {
+    if (response['code'] == 20000 || response['code'] == 20001) {
       // 获取成功
       showSnackBar('获取验证码成功', '已发送验证码', ContentType.success, context);
       return;
     }
     // 提交失败
-    showSnackBar('获取验证码失败', response['msg'], ContentType.failure, context);
+    showSnackBar('获取验证码失败', response['msg']?? '', ContentType.failure, context);
   }
 
 
@@ -189,7 +189,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         onPressed: () async {
                           if ((_formKey.currentState as FormState).validate()) {
                             // 提交表单
-                            final String phoneNumber = _passwordController.text;
+                            final String phoneNumber = _phoneController.text;
                             final String validationCode = _codeController.text;
                             final String realName = _nameController.text;
                             final String password = _passwordController.text;
@@ -204,7 +204,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             }
 
                             // 注册失败
-                            showSnackBar('注册失败', response['msg'], ContentType.failure, context);
+                            showSnackBar('注册失败', response['msg'] ?? '', ContentType.failure, context);
                           }
                         },
                         child: const Text('提交'),

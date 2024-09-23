@@ -39,7 +39,7 @@ class LoginApiService {
 
   Future<Map<String, dynamic>> loginWithCode(String phoneNumber, String validationCode, BuildContext ctx) async {
     try {
-      Response response = await _dio.post('/courier/login/phone', queryParameters: {
+      Response response = await _dio.post('/courier/login/phone', data: {
         'phoneNumber': phoneNumber,
         'validationCode': validationCode
       });
@@ -52,12 +52,12 @@ class LoginApiService {
     }
   }
 
-  // TODO
-  Future<Map<String, dynamic>> resetPassword(String phoneNumber, String password) async {
+  Future<Map<String, dynamic>> resetPassword(String phoneNumber, String code, String password) async {
     try {
-      Response response = await _dio.get('/common/phone', queryParameters: {
-        'phoneNumber': phoneNumber,
-        'password': password
+      Response response = await _dio.put('/courier/findPasswordByValidationCode', data: {
+        'phone': phoneNumber,
+        'code': code,
+        'newPassword': password
       });
 
       return response.data;

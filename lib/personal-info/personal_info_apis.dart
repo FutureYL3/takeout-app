@@ -15,8 +15,8 @@ import '../welcome/welcome_page.dart';
 
 class PersonalInfoApiService {
   final FlutterSecureStorage  secureStorage = const FlutterSecureStorage();
-  // static const String baseUrl = 'http://114.55.108.97:8080';
-  static const String baseUrl = 'http://47.99.35.140:8080';
+  static const String baseUrl = 'http://114.55.108.97:8080';
+  // static const String baseUrl = 'http://47.99.35.140:8080';
   late Dio dio;
 
   PersonalInfoApiService() {

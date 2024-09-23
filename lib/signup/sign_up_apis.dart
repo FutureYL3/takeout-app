@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import '../utils/common_utils.dart';
 
 class SignUpApiService {
-  static const String baseUrl = 'https://api.example.com';
+  static const String baseUrl = 'http://114.55.108.97:8080';
   late Dio _dio;
 
   SignUpApiService() {

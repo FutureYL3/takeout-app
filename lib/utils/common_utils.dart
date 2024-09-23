@@ -67,13 +67,13 @@ class CommonUtilsApiService {
     }
   }
 
-  // TODO: 添加一个新的方法，用于验证验证码
   Future<Map<String, dynamic>> checkValidationCode(String phoneNumber, String validationCode) async {
     try {
       // 发起 POST 请求，并将 phoneNumber 和 validationCode 作为参数
-      Response response = await _dio.post('/common/phone', data: {
-        'phoneNumber': phoneNumber,
-        'validationCode': validationCode,
+      Response response = await _dio.put('/courier/findPasswordByValidationCode', data: {
+        'phone': phoneNumber,
+        'code': validationCode,
+        'newPassword': ''
       });
 
       // 返回响应数据

@@ -42,10 +42,10 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage>{
       showSnackBar('错误', '网络错误，请检查网络连接', ContentType.failure, context);
       return;
     }
-    if (response['code'] == 1) {
+    if (response['code'] == 20000 || response['code'] == 20001) {
       showSnackBar('成功', "已发送验证码", ContentType.success, context);
     } else {
-      showSnackBar('错误', response['msg'], ContentType.success, context);
+      showSnackBar('错误', response['msg'], ContentType.failure, context);
       return;
     }
 
@@ -89,17 +89,19 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage>{
     }
 
     // 验证码错误
-    Map<String, dynamic> response = await _apiService.checkValidationCode(phoneController.text, codeController.text);
+    final String phone = phoneController.text;
+    final String code = codeController.text;
+    Map<String, dynamic> response = await _apiService.checkValidationCode(phone, code);
     if (response['error'] == true) {
       showSnackBar('错误', '网络错误，请检查网络连接', ContentType.failure, context);
       return;
     }
     if (response['code'] == 0) {
-      showSnackBar('错误', response['msg'], ContentType.failure, context);
+      showSnackBar('错误', response['msg']?? '', ContentType.failure, context);
       return;
     } 
     // 跳转到下一步
-    Get.to(() => ResetPasswordPage(phoneNumber: phoneController.text));
+    Get.to(() => ResetPasswordPage(phoneNumber: phone, validationCode: code));
   }
 
   @override

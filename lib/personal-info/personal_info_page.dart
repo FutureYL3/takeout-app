@@ -60,7 +60,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
     if (response['code'] == 1) {
       setState(() {
         idCardNumber  = response['data']['id_card_number'];
-        imageUrl = response['data']['imageURL'];
+        imageUrl = response['data']['imageUrl'];
         phone = getPhone;
       });
     }

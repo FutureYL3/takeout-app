@@ -35,13 +35,13 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
     }
     // 发送请求
     Map<String, dynamic> response = await utils.getValidationCode(phoneNumber);
-    if (response['code'] == 1) {
+    if (response['code'] == 20000 || response['code'] == 20001) {
       // 获取成功
       showSnackBar('获取验证码成功', '已发送验证码', ContentType.success, context);
       return;
     }
     // 提交失败
-    showSnackBar('获取验证码失败', response['msg'], ContentType.failure, context);
+    showSnackBar('获取验证码失败', response['msg'] ?? '', ContentType.failure, context);
   }
 
   void login() async {
@@ -63,7 +63,7 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
         return;
       } else {
         // 登录失败
-        showSnackBar('登录失败', response['msg'], ContentType.failure, context);
+        showSnackBar('登录失败', response['msg'] ?? '', ContentType.failure, context);
       }
     }
   }

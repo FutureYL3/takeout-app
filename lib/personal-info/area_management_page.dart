@@ -78,7 +78,7 @@ class _AreaManagementPageState extends State<AreaManagementPage> {
                 const SizedBox(height: 10),
                 DropdownButton<String>(
                   value: modifiedArea,
-                  items: <String>['我是修改工作区域2132', '校区2', '校区3']
+                  items: <String>['校区1', '校区2', '校区3']
                       .map((String value) {
                     return DropdownMenuItem<String>(
                       value: value,

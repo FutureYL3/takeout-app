@@ -8,7 +8,8 @@ import './login_apis.dart';
 
 class ResetPasswordPage extends StatefulWidget {
   final String phoneNumber;
-  const ResetPasswordPage({super.key, required this.phoneNumber});
+  final String validationCode;
+  const ResetPasswordPage({super.key, required this.phoneNumber, required this.validationCode});
   
   @override
   State<ResetPasswordPage> createState() => _ResetPasswordPageState();
@@ -47,7 +48,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       errorText2 = null;
     });
 
-    Map<String, dynamic> response = await _apiService.resetPassword(widget.phoneNumber, _passwordController.text);
+    Map<String, dynamic> response = await _apiService.resetPassword(widget.phoneNumber, widget.validationCode, _passwordController.text);
     if (response['error'] == true) {
       // 重置密码失败
       showSnackBar('错误', '网络错误，请检查网络连接', ContentType.failure, context);
@@ -61,7 +62,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       return;
     } else {
       // 重置密码失败
-      showSnackBar('错误', response['msg'], ContentType.failure, context);
+      showSnackBar('错误', response['msg']?? '', ContentType.failure, context);
     }
   }
 

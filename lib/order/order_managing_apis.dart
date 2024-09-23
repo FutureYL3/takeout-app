@@ -12,8 +12,8 @@ import '../welcome/welcome_page.dart';
 
 class OrderManagingApiService {
   final FlutterSecureStorage  secureStorage = const FlutterSecureStorage();
-  // static const String baseUrl = 'http://114.55.108.97:8080';
-  static const String baseUrl = 'http://47.99.35.140:8080';
+  static const String baseUrl = 'http://114.55.108.97:8080';
+  // static const String baseUrl = 'http://47.99.35.140:8080';
   late Dio dio;
 
   OrderManagingApiService() {
@@ -76,19 +76,19 @@ class OrderManagingApiService {
       // 处理 Dio 的错误
       String tabName = '';
       switch (status) {
-        case 0:
+        case 1:
           tabName = '待处理';
           break;
-        case 1:
+        case 2:
           tabName = '已接单';
           break;
-        case 2:
+        case 3:
           tabName = '配送中';
           break;
-        case 3:
+        case 4:
           tabName = '已完成';
           break;
-        case 4:
+        case 5:
           tabName = '已取消';
           break;
       }
