@@ -48,14 +48,14 @@ class _OrderCardWithButtonState extends State<OrderCardWithButton> {
       color: Colors.grey[300],
       margin: const EdgeInsets.only(bottom: 20),
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 Text(
-                  widget.orderId.toString(),
+                  '#${widget.orderId.toString()}',
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -85,8 +85,13 @@ class _OrderCardWithButtonState extends State<OrderCardWithButton> {
                 )
               ],
             ),
-            const SizedBox(height: 8),
-            Text(widget.customerAddress),
+            Row(
+              children: [
+                Text(widget.customerName),
+                const SizedBox(width: 10),
+                Text(widget.customerAddress)
+              ],
+            ),
             const SizedBox(height: 4),
             Text(
               widget.orderAddress,

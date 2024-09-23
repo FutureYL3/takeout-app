@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:get/get.dart';
 import 'package:takeout/order/order_card.dart';
 
@@ -61,6 +63,53 @@ class _OrderDeliveringPageState extends State<OrderDeliveringPage> with Automati
 
   @override
   bool get wantKeepAlive => true; // 确保页面在切换时保持活动状态
+
+  void _showContactOptions(BuildContext context, String countryCode, String phoneNumber) {
+    void makeDirectCall() async {
+      await FlutterPhoneDirectCaller.callNumber('$countryCode$phoneNumber');
+    }
+
+    showCupertinoModalPopup(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoActionSheet(
+          // title: const Text('联系用户'),
+          // message: const Text('请选择联系方式'),
+          actions: <Widget>[
+            CupertinoActionSheetAction(
+              onPressed: () {
+                makeDirectCall();
+                Navigator.pop(context);
+              },
+              child: const Text('电话联系',
+                style: TextStyle(
+                  fontSize: 22
+                ),
+              ),
+            ),
+            CupertinoActionSheetAction(
+              onPressed: () {
+                // TODO: 添加私信联系的逻辑
+                Navigator.pop(context);
+              },
+              child: const Text('私信联系',
+                style: TextStyle(
+                  fontSize: 22
+                ),
+              ),
+            ),
+          ],
+          // cancelButton: CupertinoActionSheetAction(
+          //   onPressed: () {
+          //     Navigator.pop(context);
+          //   },
+          //   isDefaultAction: true,
+          //   child: const Text('取消'),
+          // ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -147,10 +196,7 @@ class _OrderDeliveringPageState extends State<OrderDeliveringPage> with Automati
                       // 更新订单状态为 completed
                       orderController.updateOrderStatus(orderController.deliveryingOrders, order.orderId, 4, context);
                     },
-                    onRearButtonPressed: () {
-                      // TODO：联系用户
-                      
-                    },
+                    onRearButtonPressed: () => _showContactOptions(context, '+86', order.customerPhone),
                     customerPhone: order.customerPhone,
                     status: 3,
                   );

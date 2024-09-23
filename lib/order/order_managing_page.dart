@@ -19,7 +19,7 @@ class OrderManagingPage extends StatefulWidget {
 
 class _OrderManagingPageState extends State<OrderManagingPage> {
   int _selectedIndex = 1;
-  int _selectedItem = 0;
+  int _selectedItem = 2;
 
   // 存储已经加载的页面
   final Map<int, Widget> _loadedPages = {};

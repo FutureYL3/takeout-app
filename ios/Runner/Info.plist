@@ -50,5 +50,9 @@
 	<string>App needs camera access to take photos</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>App needs access to photo library to upload avatar</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>tel</string>
+	</array>
 </dict>
 </plist>
