@@ -241,7 +241,7 @@ class OrderController extends GetxController {
       deliveryingOrders.clear();
 
       deliveryingOrders
-        ..add(Order(orderId: 1, deliveryTime: "12:00", customerName: '王先生', customerPhone: '18872333356', customerAddress: '八公寓', orderAddress: '学子餐厅', foodItems: [FoodItem('干拌粉', 1), FoodItem('干拌粉', 1), FoodItem('干拌粉', 1), FoodItem('干拌粉', 1)], status: 1))
+        ..add(Order(orderId: 1, deliveryTime: "12:00", customerName: '王先生', customerPhone: '18588602616', customerAddress: '八公寓', orderAddress: '学子餐厅', foodItems: [FoodItem('干拌粉', 1), FoodItem('干拌粉', 1), FoodItem('干拌粉', 1), FoodItem('干拌粉', 1)], status: 1))
         ..add(Order(orderId: 2, deliveryTime: "12:00", customerName: '王先生', customerPhone: '18423129451', customerAddress: '八公寓', orderAddress: '学子餐厅', foodItems: [FoodItem('干拌粉', 1), FoodItem('干拌粉', 1)], status: 1))
         ..add(Order(orderId: 3, deliveryTime: "12:00", customerName: '王先生', customerPhone: '18423129451', customerAddress: '八公寓', orderAddress: '学子餐厅', foodItems: [FoodItem('干拌粉', 1), FoodItem('干拌粉', 1)], status: 1));
 
