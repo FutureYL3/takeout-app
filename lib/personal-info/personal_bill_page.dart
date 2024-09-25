@@ -41,7 +41,8 @@ class _PersonalBillPageState extends State<PersonalBillPage> {
       await Get.offAll(() => const WelcomePage());
       return;
     }
-    Map<String, dynamic> response = await personalInfoApiService.getBillList(phone, _selectedDateRange, '', _selectedFilter, context);
+    String like = _searchController.text;
+    Map<String, dynamic> response = await personalInfoApiService.getBillList(phone, _selectedDateRange, like, _selectedFilter, context);
     if (response['code'] == 401) {
       Map<String, dynamic> refreshData = await personalInfoApiService.refreshAccessToken(context);
       if (refreshData['code'] == 409) {
@@ -152,7 +153,7 @@ class _PersonalBillPageState extends State<PersonalBillPage> {
             children: [
               DropdownButton<String>(
                 value: _selectedDateRange,
-                items: <String>['本日', '本周', '本月']
+                items: <String>['本日', '近7天', '近30天']
                     .map((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
@@ -179,19 +180,50 @@ class _PersonalBillPageState extends State<PersonalBillPage> {
           ),
           const Divider(),
           // 搜索与筛选
+          
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              // 搜索框
               Expanded(
-                child: TextField(
-                  controller: _searchController,
-                  decoration: const InputDecoration(
-                    hintText: '流水明细',
-                    border: OutlineInputBorder(),
-                    suffixIcon: Icon(Icons.search),
-                  ),
+                // width: 200,
+                // height: 40,
+                // decoration: BoxDecoration(
+                //   color: Colors.grey[300],
+                //   borderRadius: BorderRadius.circular(5),
+                // ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        decoration: const InputDecoration(
+                          hintText: '流水明细',
+                          border: OutlineInputBorder(),
+                          // suffixIcon: Icon(Icons.search),
+                        ),
+                        controller: _searchController,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: GestureDetector(
+                        onTap: regetData, 
+                        child: const Icon(Icons.search),
+                      )
+                    ),
+                  ],
                 ),
               ),
+              // Expanded(
+              //   child: TextField(
+              //     controller: _searchController,
+              //     decoration: const InputDecoration(
+              //       hintText: '流水明细',
+              //       border: OutlineInputBorder(),
+              //       suffixIcon: Icon(Icons.search),
+              //     ),
+              //   ),
+              // ),
               const SizedBox(width: 10),
               DropdownButton<String>(
                 value: _selectedFilter,
@@ -211,7 +243,8 @@ class _PersonalBillPageState extends State<PersonalBillPage> {
               ),
             ],
           ),
-          const Divider(),
+          // const Divider(),
+          const SizedBox(height: 10),
           // 订单明细列表
           Expanded(
             child: ListView(
@@ -235,7 +268,7 @@ class _PersonalBillPageState extends State<PersonalBillPage> {
           children: [
             Text('订单编号：$orderNumber', style: const TextStyle(fontSize: 14)),
             const SizedBox(height: 4),
-            Text('配送费：$fee', style: const TextStyle(fontSize: 14)),
+            Text('配送费：$fee元', style: const TextStyle(fontSize: 14)),
             const SizedBox(height: 4),
             Text('到账方式：$paymentMethod', style: const TextStyle(fontSize: 14)),
           ],

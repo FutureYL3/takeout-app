@@ -48,7 +48,7 @@ class _OrderManagingPageState extends State<OrderManagingPage> {
         children: [
           // 左侧菜单栏
           Container(
-            width: 90,
+            width: 70,
             color: Colors.grey[200],
             child: ListView(
               children: [
@@ -103,9 +103,10 @@ class _OrderManagingPageState extends State<OrderManagingPage> {
         });
       },
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.fromLTRB(8, 16, 8, 16),
         child: Text(
           title,
+          textAlign: TextAlign.center,
           style: TextStyle(
             color: _selectedItem == index ? Colors.blue : Colors.black,
             fontWeight: _selectedItem == index ? FontWeight.bold : FontWeight.normal,

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart' hide Response, FormData, MultipartFile;
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 
@@ -180,10 +181,27 @@ class PersonalInfoApiService {
   }
 
   Future<Map<String, dynamic>> getBillList(String phone, String dateRange, String like, String type, BuildContext ctx) async {
+    DateTime now = DateTime.now();
+    DateTime start = now;
+    switch (dateRange) {
+      case '本日':
+        start = DateTime(now.year, now.month, now.day);
+        break;
+      case '近7天':
+        start = now.subtract(const Duration(days: 7));
+        break;
+      case '近30天':
+        start = now.subtract(const Duration(days: 30));
+        break;
+    }
+    // 时间日期格式化为yyyy-MM-dd
+    String startDate = DateFormat('yyyy-MM-dd').format(start);
+    String endDate = DateFormat('yyyy-MM-dd').format(now);
     try {
       Response response = await dio.get('/courier/viewEarningsHistory', queryParameters: {
         'phone': phone,
-        'dateRange': dateRange,
+        'start': startDate,
+        'end': endDate,
         'like': like,
         'type': type,
       });
