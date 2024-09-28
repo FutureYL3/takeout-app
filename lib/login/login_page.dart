@@ -136,7 +136,7 @@ class _LoginPageState extends State<LoginPage> {
                       SizedBox(height: MediaQuery.sizeOf(context).height * 0.02), 
                       GestureDetector(
                         onTap: () {
-                          Get.off(() => const PhoneLoginPage());
+                          Get.to(() => const PhoneLoginPage());
                         },
                         child: const Text(
                           '手机号一键登录',

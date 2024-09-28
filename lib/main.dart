@@ -7,7 +7,7 @@ import 'welcome/welcome_page.dart';
 import 'home/home_page.dart';
 
 
-void main() async{
+void main() async {
   // 确保 Flutter 框架已初始化
   WidgetsFlutterBinding.ensureInitialized();
   // 初始化控制器
@@ -16,7 +16,7 @@ void main() async{
   runApp(MyApp(isLogin));
 }
 
-Future<bool> getLoginStatus() async{
+Future<bool> getLoginStatus() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   return prefs.getBool("Login_Status") ?? false;
   // return true;

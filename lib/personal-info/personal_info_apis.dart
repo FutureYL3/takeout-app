@@ -199,11 +199,11 @@ class PersonalInfoApiService {
     String endDate = DateFormat('yyyy-MM-dd').format(now);
     try {
       Response response = await dio.get('/courier/viewEarningsHistory', queryParameters: {
-        'phone': phone,
+        // 'phone': phone,
         'start': startDate,
         'end': endDate,
-        'like': like,
-        'type': type,
+        'number': like,
+        // 'type': null,
       });
 
       return response.data;

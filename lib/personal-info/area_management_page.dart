@@ -56,7 +56,7 @@ class _AreaManagementPageState extends State<AreaManagementPage> {
     }
     if (response['code'] == 1) {
       final String? tempDeliveryArea = response['data']['location'];
-      final String? tempSchoolName = response['data']['university'];
+      final String? tempSchoolName = response['data']['college'];
       setState(() {
         deliveryArea = tempDeliveryArea;
         schoolName = tempSchoolName;

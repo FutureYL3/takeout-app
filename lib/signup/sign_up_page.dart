@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
@@ -23,28 +25,54 @@ class _SignUpPageState extends State<SignUpPage> {
 
   final CommonUtilsApiService utils = CommonUtilsApiService();
 
-  void getValidationCode() async {
-    String phoneNumber = _phoneController.text;
-    RegExp regTel = RegExp(r'^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$');
-    if (phoneNumber.isEmpty) {
-      showSnackBar('获取验证码失败', '请输入手机号', ContentType.failure, context);
-      return;
-    }
-    if (!regTel.hasMatch(phoneNumber)) {
-      showSnackBar('获取验证码失败', '请输入正确的手机号', ContentType.failure, context);
-      return;
-    }
-    // 发送请求
-    Map<String, dynamic> response = await utils.getValidationCode(phoneNumber);
-    if (response['code'] == 20000 || response['code'] == 20001) {
-      // 获取成功
-      showSnackBar('获取验证码成功', '已发送验证码', ContentType.success, context);
-      return;
-    }
-    // 提交失败
-    showSnackBar('获取验证码失败', response['msg']?? '', ContentType.failure, context);
-  }
+  int _countdown = 60;
+  Timer? _timer;
+  bool _canResend = true;
 
+  // 开始倒计时
+  void _startCountdown() async {
+    RegExp regTel = RegExp(r'^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$');
+
+    if (_phoneController.text.isEmpty) {
+      showSnackBar('错误', '手机号不能为空', ContentType.failure, context);
+      return;
+    }
+
+    if (!regTel.hasMatch(_phoneController.text)) {
+      showSnackBar('错误', '请输入正确的手机号', ContentType.failure, context);
+      return;
+    }
+
+    // 获取验证码
+    Map<String, dynamic> response = await utils.getValidationCode(_phoneController.text);
+
+    if (response['error'] == true) {
+      showSnackBar('错误', '网络错误，请检查网络连接', ContentType.failure, context);
+      return;
+    }
+    if (response['code'] == 20000 || response['code'] == 20001) {
+      showSnackBar('成功', "已发送验证码", ContentType.success, context);
+    } else {
+      showSnackBar('错误', response['msg'], ContentType.failure, context);
+      return;
+    }
+
+    setState(() {
+      _canResend = false;
+      _countdown = 60;
+    });
+
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        if (_countdown > 0) {
+          _countdown--;
+        } else {
+          _canResend = true;
+          _timer?.cancel();
+        }
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,10 +96,14 @@ class _SignUpPageState extends State<SignUpPage> {
                     children: [
                       TextFormField(
                         style: const TextStyle(fontSize: 14),
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: '手机号',
                           hintText: "请输入手机号",
-                          border: OutlineInputBorder()
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(color: Colors.grey),
+                          ),
+                          // filled: true,
                         ),
                         controller: _phoneController,
                         validator: (value) {
@@ -88,15 +120,19 @@ class _SignUpPageState extends State<SignUpPage> {
                       const SizedBox(height: 20,),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.56,
+                            width: MediaQuery.of(context).size.width * 0.46,
                             child: TextFormField(
                               style: const TextStyle(fontSize: 14),
-                              decoration: const InputDecoration(
+                              decoration: InputDecoration(
                                 labelText: '验证码',
                                 hintText: "请输入验证码",
-                                border: OutlineInputBorder()
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: const BorderSide(color: Colors.grey),
+                                ),
                               ),
                               controller: _codeController,
                               validator: (value) {
@@ -108,31 +144,27 @@ class _SignUpPageState extends State<SignUpPage> {
                             ),
                           ),
                           SizedBox(width: MediaQuery.of(context).size.width * 0.04),
-                          GestureDetector(
-                            onTap: getValidationCode,
-                            child: Container(
-                              // margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.02),1
-                              alignment: Alignment.center,
-                              height: MediaQuery.of(context).size.height * 0.04,
-                              width: MediaQuery.of(context).size.width * 0.2,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: Colors.green),
-                              ),
-                              child: const Text(
-                                "获取验证码",
-                              ),
+                          ElevatedButton(
+                            onPressed: _canResend ? _startCountdown : null,
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: Size(MediaQuery.of(context).size.width * 0.2, 50),
+                              // maximumSize: const Size(120, 50),
+                              textStyle: const TextStyle(fontSize: 14),
                             ),
-                          )
+                            child: Text(_canResend ? '获取验证码' : '(${_countdown}s)'),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 20,),
                       TextFormField(
                         style: const TextStyle(fontSize: 14),
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: '使用人姓名',
                           hintText: "请输入外卖员姓名",
-                          border: OutlineInputBorder()
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(color: Colors.grey),
+                          ),
                         ),
                         controller: _nameController,
                         validator: (value) {
@@ -145,10 +177,13 @@ class _SignUpPageState extends State<SignUpPage> {
                       const SizedBox(height: 20,),
                       TextFormField(
                         style: const TextStyle(fontSize: 14),
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: '登录密码',
                           hintText: "请输入登录密码",
-                          border: OutlineInputBorder()
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(color: Colors.grey),
+                          ),
                         ),
                         keyboardType: TextInputType.visiblePassword,
                         obscureText: true,
@@ -163,10 +198,13 @@ class _SignUpPageState extends State<SignUpPage> {
                       const SizedBox(height: 20,),
                       TextFormField(
                         style: const TextStyle(fontSize: 14),
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: '确认登录密码',
                           hintText: "请再次输入登录密码",
-                          border: OutlineInputBorder()
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(color: Colors.grey),
+                          ),
                         ),
                         keyboardType: TextInputType.visiblePassword,
                         obscureText: true,
@@ -218,5 +256,16 @@ class _SignUpPageState extends State<SignUpPage> {
         ),
       )
     );
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _phoneController.dispose();
+    _codeController.dispose();
+    _nameController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
   }
 }
