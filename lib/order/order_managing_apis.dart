@@ -63,10 +63,10 @@ class OrderManagingApiService {
       String startDate = DateFormat('yyyy-MM-dd').format(start);
       String endDate = DateFormat('yyyy-MM-dd').format(end);
 
-      Response response = await dio.get('/courier/orderlooking', queryParameters: {
-        'phoneNumber': phone,
-        'beginDate': startDate,
-        'endDate': endDate,
+      Response response = await dio.get('/orders/orders/courier/viewOrder', data: {
+        // 'phoneNumber': phone,
+        'start': startDate,
+        'end': endDate,
         'status': status,
         'like': like,
       });
@@ -97,12 +97,12 @@ class OrderManagingApiService {
     }
   }
 
-  Future<Map<String, dynamic>> updateOrders(String phone, int orderId, int updatedStatus, BuildContext ctx) async {
+  Future<Map<String, dynamic>> updateOrders(String phone, String orderId, int updatedStatus, BuildContext ctx) async {
     try {
-      Response response = await dio.put('/courier/orderUpdate', data: {
-        'phoneNumber': phone,
-        'order_id': orderId,
-        'updatedStatus': updatedStatus,
+      Response response = await dio.put('/orders/courier/orderUpdate', data: {
+        // 'phoneNumber': phone,
+        'orderId': orderId,
+        'newStatus': updatedStatus,
       });
 
       return response.data;

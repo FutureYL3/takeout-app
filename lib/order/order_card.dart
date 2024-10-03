@@ -4,7 +4,7 @@ import 'order_model.dart';
 
 // ignore: must_be_immutable
 class OrderCardWithButton extends StatefulWidget {
-  final int orderId;
+  final String orderId;
   final String deliveryTime;
   final String customerName;
   final String customerPhone;
@@ -62,27 +62,35 @@ class _OrderCardWithButtonState extends State<OrderCardWithButton> {
                   ),
                 ),
                 const SizedBox(width: 10),
-                Text(widget.deliveryTime),
+                Text(widget.deliveryTime.split("T")[1].substring(0, 5)),
                 const Spacer(),
-                Row(
-                  children: [
-                    ElevatedButton(
-                      onPressed: widget.onFrontButtonPressed,
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(60, 30),
-                      ),
-                      child: Text(widget.frontButtonText),
+                
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: widget.onFrontButtonPressed,
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(40, 30),
                     ),
-                    const SizedBox(width: 10),
-                    ElevatedButton(
-                      onPressed: widget.onRearButtonPressed,
-                      style: OutlinedButton.styleFrom(
-                        minimumSize: const Size(60, 30),
-                      ),
-                      child: Text(widget.rearButtonText),
+                    child: Text(widget.frontButtonText),
+                  ),
+                ),
+                
+                const SizedBox(width: 10),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: widget.onRearButtonPressed,
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size(40, 30),
                     ),
-                  ],
+                    child: Text(widget.rearButtonText),
+                  ),
                 )
+                
               ],
             ),
             Row(
@@ -130,7 +138,7 @@ class _OrderCardWithButtonState extends State<OrderCardWithButton> {
 
 // ignore: must_be_immutable
 class OrderCardWithoutButton extends StatefulWidget {
-  final int orderId;
+  final String orderId;
   final String deliveryTime;
   final String customerName;
   final String customerAddress;
@@ -184,7 +192,7 @@ class _OrderCardWithoutButtonState extends State<OrderCardWithoutButton> {
                   ),
                 ),
                 const SizedBox(width: 10),
-                Text(widget.deliveryTime),
+                Text(widget.deliveryTime.split("T")[1].substring(0, 5)),
                 const Spacer(),
                 Text(widget.completeTime ?? ''),
                 Text(widget.hintText)

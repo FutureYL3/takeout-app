@@ -1,5 +1,5 @@
 class Order {
-  final int orderId;
+  final String orderId;
   final String deliveryTime;
   final String customerName;
   final String customerPhone;

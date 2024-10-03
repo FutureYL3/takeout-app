@@ -143,7 +143,7 @@ class _OrderAcceptedPageState extends State<OrderAcceptedPage> with AutomaticKee
                     customerName: order.customerName,
                     customerAddress: order.customerAddress,
                     orderAddress: order.orderAddress,
-                    frontButtonText: '接单',
+                    frontButtonText: '已取餐',
                     rearButtonText: '取消',
                     foodItems: order.foodItems,
                     onFrontButtonPressed: () {

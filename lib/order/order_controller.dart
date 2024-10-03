@@ -64,13 +64,13 @@ class OrderController extends GetxController {
         pendingOrders.clear();
         for (var order in result['data']) {
           pendingOrders.add(Order(
-            orderId: order['order_id'],
+            orderId: order['number'],
             deliveryTime: order['deliveryTime'],
-            customerName: order['user_name'],
-            customerPhone: order['user_phoneNumber'],
-            customerAddress: order['user_address'],
-            orderAddress: order['merchant_address'],
-            foodItems: (order['orderList'] as List).map((item) => FoodItem(item['dish_name'], item['dish_num'])).toList(),
+            customerName: order['name'],
+            customerPhone: order['cphone'],
+            customerAddress: order['caddress'],
+            orderAddress: order['maddress'],
+            foodItems: ((order['vos'] ?? []) as List).map((item) => FoodItem(item['dishName'], item['dishSales'])).toList(),
             status: status,
             completeTime: order['completeTime'] ?? '', // TODO: 与后端沟通
           ));
@@ -146,13 +146,13 @@ class OrderController extends GetxController {
         acceptedOrders.clear();
         for (var order in result['data']) {
           acceptedOrders.add(Order(
-            orderId: order['order_id'],
+            orderId: order['number'],
             deliveryTime: order['deliveryTime'],
-            customerName: order['user_name'],
-            customerPhone: order['user_phoneNumber'],
-            customerAddress: order['user_address'],
-            orderAddress: order['merchant_address'],
-            foodItems: (order['orderList'] as List).map((item) => FoodItem(item['dish_name'], item['dish_num'])).toList(),
+            customerName: order['name'],
+            customerPhone: order['cphone'],
+            customerAddress: order['caddress'],
+            orderAddress: order['maddress'],
+            foodItems: ((order['vos'] ?? []) as List).map((item) => FoodItem(item['dishName'], item['dishSales'])).toList(),
             status: status,
             completeTime: order['completeTime'] ?? '', // TODO: 与后端沟通
           ));
@@ -190,60 +190,60 @@ class OrderController extends GetxController {
   Future<void> fetchDeliveryingOrders(DateTime start, DateTime end, String? like, BuildContext ctx, {required bool isInitFetch}) async {
 
     Future<void> fetchData() async {
-      // // 实现API调用，获取订单数据并赋值给deliveryingOrders
-      // String? phone = await secureStorage.read(key: 'phone');
-      // int status = 3;
-      // final SharedPreferences prefs = await SharedPreferences.getInstance();
+      // 实现API调用，获取订单数据并赋值给deliveryingOrders
+      String? phone = await secureStorage.read(key: 'phone');
+      int status = 3;
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-      // if (phone == null) {
-      //   // 如果没有存储手机号，即表示未登录，跳转到欢迎页面
-      //   await Get.offAll(() => const WelcomePage());
-      //   return;
-      // }
+      if (phone == null) {
+        // 如果没有存储手机号，即表示未登录，跳转到欢迎页面
+        await Get.offAll(() => const WelcomePage());
+        return;
+      }
       
-      // Map<String, dynamic> result = await apiService.getOrders(phone, start, end, status, like, ctx);
+      Map<String, dynamic> result = await apiService.getOrders(phone, start, end, status, like, ctx);
 
-      // if (result['code'] == 401) {
-      //   Map<String, dynamic> refreshData = await apiService.refreshAccessToken(ctx);
-      //   if (refreshData['code'] == 409) {
-      //     // 如果refreshToken也过期了，要求重新登录
-      //     await secureStorage.deleteAll();
-      //     await prefs.setBool('Login_Status', false);
-      //     Get.offAll(() => const WelcomePage());
-      //     return;
-      //   }
-      //   if (refreshData['code'] == 1) {
-      //     secureStorage.write(key: 'accessToken', value: refreshData['data']['accessToken']);
-      //     secureStorage.write(key: 'refreshToken', value: refreshData['data']['refreshToken']);
-      //   }
-      //   fetchDeliveryingOrders(start, end, like, ctx, isInitFetch: isInitFetch); // 重新获取数据
-      //   return;
-      // }
+      if (result['code'] == 401) {
+        Map<String, dynamic> refreshData = await apiService.refreshAccessToken(ctx);
+        if (refreshData['code'] == 409) {
+          // 如果refreshToken也过期了，要求重新登录
+          await secureStorage.deleteAll();
+          await prefs.setBool('Login_Status', false);
+          Get.offAll(() => const WelcomePage());
+          return;
+        }
+        if (refreshData['code'] == 1) {
+          secureStorage.write(key: 'accessToken', value: refreshData['data']['accessToken']);
+          secureStorage.write(key: 'refreshToken', value: refreshData['data']['refreshToken']);
+        }
+        fetchDeliveryingOrders(start, end, like, ctx, isInitFetch: isInitFetch); // 重新获取数据
+        return;
+      }
 
-      // if (result['code'] == 1) {
-      //   deliveryingOrders.clear();
-      //   for (var order in result['data']) {
-      //     deliveryingOrders.add(Order(
-      //       orderId: order['order_id'],
-      //       deliveryTime: order['deliveryTime'],
-      //       customerName: order['user_name'],
-      //       customerPhone: order['user_phoneNumber'],
-      //       customerAddress: order['user_address'],
-      //       orderAddress: order['merchant_address'],
-      //       foodItems: (order['orderList'] as List).map((item) => FoodItem(item['dish_name'], item['dish_num'])).toList(),
-      //       status: status,
-      //       completeTime: order['completeTime'] ?? '', // TODO: 与后端沟通
-      //     ));
-      //   }
-      //   deliveryingOrders.refresh(); // 通知监听者
-      // }
+      if (result['code'] == 1) {
+        deliveryingOrders.clear();
+        for (var order in result['data']) {
+          deliveryingOrders.add(Order(
+            orderId: order['number'],
+            deliveryTime: order['deliveryTime'],
+            customerName: order['name'],
+            customerPhone: order['cphone'],
+            customerAddress: order['caddress'],
+            orderAddress: order['maddress'],
+            foodItems: ((order['vos'] ?? []) as List).map((item) => FoodItem(item['dishName'], item['dishSales'])).toList(),
+            status: status,
+            completeTime: order['completeTime'] ?? '', // TODO: 与后端沟通
+          ));
+        }
+        deliveryingOrders.refresh(); // 通知监听者
+      }
 
-      deliveryingOrders.clear();
+      // deliveryingOrders.clear();
 
-      deliveryingOrders
-        ..add(Order(orderId: 1, deliveryTime: "12:00", customerName: '王先生', customerPhone: '18588602616', customerAddress: '八公寓', orderAddress: '学子餐厅', foodItems: [FoodItem('干拌粉', 1), FoodItem('干拌粉', 1), FoodItem('干拌粉', 1), FoodItem('干拌粉', 1)], status: 1))
-        ..add(Order(orderId: 2, deliveryTime: "12:00", customerName: '王先生', customerPhone: '18423129451', customerAddress: '八公寓', orderAddress: '学子餐厅', foodItems: [FoodItem('干拌粉', 1), FoodItem('干拌粉', 1)], status: 1))
-        ..add(Order(orderId: 3, deliveryTime: "12:00", customerName: '王先生', customerPhone: '18423129451', customerAddress: '八公寓', orderAddress: '学子餐厅', foodItems: [FoodItem('干拌粉', 1), FoodItem('干拌粉', 1)], status: 1));
+      // deliveryingOrders
+      //   ..add(Order(orderId: 1, deliveryTime: "12:00", customerName: '王先生', customerPhone: '18588602616', customerAddress: '八公寓', orderAddress: '学子餐厅', foodItems: [FoodItem('干拌粉', 1), FoodItem('干拌粉', 1), FoodItem('干拌粉', 1), FoodItem('干拌粉', 1)], status: 1))
+      //   ..add(Order(orderId: 2, deliveryTime: "12:00", customerName: '王先生', customerPhone: '18423129451', customerAddress: '八公寓', orderAddress: '学子餐厅', foodItems: [FoodItem('干拌粉', 1), FoodItem('干拌粉', 1)], status: 1))
+      //   ..add(Order(orderId: 3, deliveryTime: "12:00", customerName: '王先生', customerPhone: '18423129451', customerAddress: '八公寓', orderAddress: '学子餐厅', foodItems: [FoodItem('干拌粉', 1), FoodItem('干拌粉', 1)], status: 1));
 
       deliveryingOrders.refresh();
 
@@ -302,13 +302,13 @@ class OrderController extends GetxController {
         completedOrders.clear();
         for (var order in result['data']) {
           completedOrders.add(Order(
-            orderId: order['order_id'],
+            orderId: order['number'],
             deliveryTime: order['deliveryTime'],
-            customerName: order['user_name'],
-            customerPhone: order['user_phoneNumber'],
-            customerAddress: order['user_address'],
-            orderAddress: order['merchant_address'],
-            foodItems: (order['orderList'] as List).map((item) => FoodItem(item['dish_name'], item['dish_num'])).toList(),
+            customerName: order['name'],
+            customerPhone: order['cphone'],
+            customerAddress: order['caddress'],
+            orderAddress: order['maddress'],
+            foodItems: ((order['vos'] ?? []) as List).map((item) => FoodItem(item['dishName'], item['dishSales'])).toList(),
             status: status,
             completeTime: order['completeTime'] ?? '', // TODO: 与后端沟通
           ));
@@ -367,13 +367,13 @@ class OrderController extends GetxController {
         cancelledOrders.clear();
         for (var order in result['data']) {
           cancelledOrders.add(Order(
-            orderId: order['order_id'],
+            orderId: order['number'],
             deliveryTime: order['deliveryTime'],
-            customerName: order['user_name'],
-            customerPhone: order['user_phoneNumber'],
-            customerAddress: order['user_address'],
-            orderAddress: order['merchant_address'],
-            foodItems: (order['orderList'] as List).map((item) => FoodItem(item['dish_name'], item['dish_num'])).toList(),
+            customerName: order['name'],
+            customerPhone: order['cphone'],
+            customerAddress: order['caddress'],
+            orderAddress: order['maddress'],
+            foodItems: ((order['vos'] ?? []) as List).map((item) => FoodItem(item['dishName'], item['dishSales'])).toList(),
             status: status,
             completeTime: order['completeTime'] ?? '', // TODO: 与后端沟通
           ));
@@ -396,7 +396,7 @@ class OrderController extends GetxController {
   }
 
   // 根据订单ID更新订单状态，并可选择是否同步更新服务器
-  Future<void> updateOrderStatus(RxList<Order> originList, int orderId, int newStatus, BuildContext ctx) async {
+  Future<void> updateOrderStatus(RxList<Order> originList, String orderId, int newStatus, BuildContext ctx) async {
     // 找到对应的订单
     int index = originList.indexWhere((order) => order.orderId == orderId);
 
