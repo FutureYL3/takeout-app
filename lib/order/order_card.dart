@@ -1,10 +1,18 @@
+/// @Author: yl Future_YL@outlook.com
+/// @Date: 2024-09-23 
+/// @LastEditors: yl Future_YL@outlook.com
+/// @LastEditTime: 2024-10-06 16:16
+/// @FilePath: lib/order/order_card.dart
+/// @Description: 这是单个订单展示卡片小组件
+
 import 'package:flutter/material.dart';
 
 import 'order_model.dart';
 
 // ignore: must_be_immutable
 class OrderCardWithButton extends StatefulWidget {
-  final String orderId;
+  final int orderId;
+  final String number;
   final String deliveryTime;
   final String customerName;
   final String customerPhone;
@@ -18,7 +26,7 @@ class OrderCardWithButton extends StatefulWidget {
 
   int status = -1;
 
-  OrderCardWithButton({super.key, required this.orderId, required this.deliveryTime, required this.customerName, required this.customerPhone, required this.customerAddress, required this.orderAddress, required this.frontButtonText, required this.rearButtonText, required this.foodItems, required this.status, required this.onFrontButtonPressed, required this.onRearButtonPressed,});
+  OrderCardWithButton({super.key, required this.orderId, required this.number, required this.deliveryTime, required this.customerName, required this.customerPhone, required this.customerAddress, required this.orderAddress, required this.frontButtonText, required this.rearButtonText, required this.foodItems, required this.status, required this.onFrontButtonPressed, required this.onRearButtonPressed,});
 
 
   @override
@@ -55,14 +63,14 @@ class _OrderCardWithButtonState extends State<OrderCardWithButton> {
             Row(
               children: [
                 Text(
-                  '#${widget.orderId.toString()}',
+                  '#${widget.number.toString()}',
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(width: 10),
-                Text(widget.deliveryTime.split("T")[1].substring(0, 5)),
+                Text("${widget.deliveryTime.split("T")[0].substring(5, 10)}  ${widget.deliveryTime.split("T")[1].substring(0, 5)}"),
                 const Spacer(),
                 
               ],
@@ -138,7 +146,8 @@ class _OrderCardWithButtonState extends State<OrderCardWithButton> {
 
 // ignore: must_be_immutable
 class OrderCardWithoutButton extends StatefulWidget {
-  final String orderId;
+  final int orderId;
+  final String number;
   final String deliveryTime;
   final String customerName;
   final String customerAddress;
@@ -149,7 +158,7 @@ class OrderCardWithoutButton extends StatefulWidget {
 
   int status = -1;
 
-  OrderCardWithoutButton({super.key, required this.orderId, required this.deliveryTime, required this.customerName, required this.customerAddress, required this.orderAddress, this.completeTime, required this.hintText, required this.foodItems, required this.status});
+  OrderCardWithoutButton({super.key, required this.orderId, required this.number, required this.deliveryTime, required this.customerName, required this.customerAddress, required this.orderAddress, this.completeTime, required this.hintText, required this.foodItems, required this.status});
   
   @override
   State<StatefulWidget> createState() => _OrderCardWithoutButtonState();
@@ -183,16 +192,17 @@ class _OrderCardWithoutButtonState extends State<OrderCardWithoutButton> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  widget.orderId.toString(),
+                  "#${widget.number.toString()}",
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(width: 10),
-                Text(widget.deliveryTime.split("T")[1].substring(0, 5)),
+                Text("${widget.deliveryTime.split("T")[0].substring(5, 10)}  ${widget.deliveryTime.split("T")[1].substring(0, 5)}"),
                 const Spacer(),
                 Text(widget.completeTime ?? ''),
                 Text(widget.hintText)

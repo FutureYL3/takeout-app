@@ -1,5 +1,14 @@
+/// @Author: yl Future_YL@outlook.com
+/// @Date: 2024-09-20 
+/// @LastEditors: yl Future_YL@outlook.com
+/// @LastEditTime: 2024-10-06 16:16
+/// @FilePath: lib/order/order_pending_page.dart
+/// @Description: 这是待处理订单页面
+
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'order_card.dart';
 import 'order_controller.dart';
@@ -12,23 +21,23 @@ class OrderPendingPage extends StatefulWidget {
 }
 
 class _OrderPendingPageState extends State<OrderPendingPage> with AutomaticKeepAliveClientMixin {
-  String _selectedDate = '今日';
+  late String _selectedDate = '今日';
   final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    
-    getData();
+    Future.microtask(() async {
+      init(); // 保证在页面构建后初始化数据
+  });
   }
 
-  void getData() async {
-    // 初次加载时默认显示今日订单
-    DateTime now = DateTime.now();
-    DateTime start = DateTime(now.year, now.month, now.day);
-    final OrderController orderController = Get.find<OrderController>();
-
-    orderController.fetchPendingOrders(start, now, null, context, isInitFetch: true);
+  void init() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _selectedDate = prefs.getString('pending_selectedDate') ?? '今日';
+    });
+    regetData();
   }
 
   void regetData() async {
@@ -79,10 +88,12 @@ class _OrderPendingPageState extends State<OrderPendingPage> with AutomaticKeepA
                     child: Text(value),
                   );
                 }).toList(),
-                onChanged: (value) {
+                onChanged: (value) async{
                   // 实现下拉框选择后的逻辑
+                  final SharedPreferences prefs = await SharedPreferences.getInstance();
+                  await prefs.setString('pending_selectedDate', value!);
                   setState(() {
-                    _selectedDate = value!;
+                    _selectedDate = value;
                     regetData();
                   });
                   
@@ -138,6 +149,7 @@ class _OrderPendingPageState extends State<OrderPendingPage> with AutomaticKeepA
                   var order = orderController.pendingOrders[index];
                   return OrderCardWithButton(
                     orderId: order.orderId,
+                    number: order.number,
                     deliveryTime: order.deliveryTime,
                     customerName: order.customerName,
                     customerAddress: order.customerAddress,
@@ -147,11 +159,11 @@ class _OrderPendingPageState extends State<OrderPendingPage> with AutomaticKeepA
                     foodItems: order.foodItems,
                     onFrontButtonPressed: () {
                       // 更新订单状态为 accepted
-                      orderController.updateOrderStatus(orderController.pendingOrders, order.orderId, 2, context);
+                      orderController.updateOrderStatus(orderController.pendingOrders, order.orderId, 2, context, '接单成功', '');
                     },
                     onRearButtonPressed: () {
                       // 更新订单状态为 cancelled
-                      orderController.updateOrderStatus(orderController.pendingOrders, order.orderId, 5, context);
+                      orderController.updateOrderStatus(orderController.pendingOrders, order.orderId, 5, context, '取消成功', '');
                     },
                     customerPhone: order.customerPhone,
                     status: 1,

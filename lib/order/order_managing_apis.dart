@@ -1,3 +1,10 @@
+/// @Author: yl Future_YL@outlook.com
+/// @Date: 2024-09-20 
+/// @LastEditors: yl Future_YL@outlook.com
+/// @LastEditTime: 2024-10-06 16:16
+/// @FilePath: lib/order/order_managing_apis.dart
+/// @Description: 这是订单管理模块的API
+
 import 'dart:convert';
 
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
@@ -63,7 +70,7 @@ class OrderManagingApiService {
       String startDate = DateFormat('yyyy-MM-dd').format(start);
       String endDate = DateFormat('yyyy-MM-dd').format(end);
 
-      Response response = await dio.get('/orders/orders/courier/viewOrder', data: {
+      Response response = await dio.get('/orders/courier/viewOrder', queryParameters: {
         // 'phoneNumber': phone,
         'start': startDate,
         'end': endDate,
@@ -97,7 +104,7 @@ class OrderManagingApiService {
     }
   }
 
-  Future<Map<String, dynamic>> updateOrders(String phone, String orderId, int updatedStatus, BuildContext ctx) async {
+  Future<Map<String, dynamic>> updateOrders(String phone, int orderId, int updatedStatus, BuildContext ctx) async {
     try {
       Response response = await dio.put('/orders/courier/orderUpdate', data: {
         // 'phoneNumber': phone,

@@ -1,3 +1,11 @@
+/// @Author: yl Future_YL@outlook.com
+/// @Date: 2024-09-25
+/// @LastEditors: yl Future_YL@outlook.com
+/// @LastEditTime: 2024-10-06 16:16
+/// @FilePath: lib/order/order_controller.dart
+/// @Description: 这是订单控制器类，负责各页面订单数据的获取和更新
+
+
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -64,13 +72,14 @@ class OrderController extends GetxController {
         pendingOrders.clear();
         for (var order in result['data']) {
           pendingOrders.add(Order(
-            orderId: order['number'],
+            orderId: order['id'],
+            number: order['number'],
             deliveryTime: order['deliveryTime'],
             customerName: order['name'],
             customerPhone: order['cphone'],
             customerAddress: order['caddress'],
             orderAddress: order['maddress'],
-            foodItems: ((order['vos'] ?? []) as List).map((item) => FoodItem(item['dishName'], item['dishSales'])).toList(),
+            foodItems: ((order['ordersList'] ?? []) as List).map((item) => FoodItem(item['dishName'], item['dishSales'])).toList(),
             status: status,
             completeTime: order['completeTime'] ?? '', // TODO: 与后端沟通
           ));
@@ -81,12 +90,6 @@ class OrderController extends GetxController {
     // 避免切换页面后重置先前订单数据
     if (isInitFetch) {
       if (!isPendingOrdersFetched) {
-        // pendingOrders
-        //   ..add(Order(orderId: 1, deliveryTime: "12:00", customerName: '王先生', customerPhone: '18423129451', customerAddress: '八公寓', orderAddress: '学子餐厅', foodItems: [FoodItem('干拌粉', 1), FoodItem('干拌粉', 1), FoodItem('干拌粉', 1), FoodItem('干拌粉', 1)], status: 1))
-        //   ..add(Order(orderId: 2, deliveryTime: "12:00", customerName: '王先生', customerPhone: '18423129451', customerAddress: '八公寓', orderAddress: '学子餐厅', foodItems: [FoodItem('干拌粉', 1), FoodItem('干拌粉', 1)], status: 1))
-        //   ..add(Order(orderId: 3, deliveryTime: "12:00", customerName: '王先生', customerPhone: '18423129451', customerAddress: '八公寓', orderAddress: '学子餐厅', foodItems: [FoodItem('干拌粉', 1), FoodItem('干拌粉', 1)], status: 1));
-
-        // pendingOrders.refresh();
 
         await fetchData();
         isPendingOrdersFetched = true;
@@ -96,14 +99,6 @@ class OrderController extends GetxController {
       }
       
     } else {
-      // pendingOrders.clear();
-
-      // pendingOrders
-      //   ..add(Order(orderId: 1, deliveryTime: "12:00", customerName: '王先生', customerPhone: '18423129451', customerAddress: '八公寓', orderAddress: '学子餐厅', foodItems: [FoodItem('干拌粉', 1), FoodItem('干拌粉', 1), FoodItem('干拌粉', 1), FoodItem('干拌粉', 1)], status: 1))
-      //   ..add(Order(orderId: 2, deliveryTime: "12:00", customerName: '王先生', customerPhone: '18423129451', customerAddress: '八公寓', orderAddress: '学子餐厅', foodItems: [FoodItem('干拌粉', 1), FoodItem('干拌粉', 1)], status: 1))
-      //   ..add(Order(orderId: 3, deliveryTime: "12:00", customerName: '王先生', customerPhone: '18423129451', customerAddress: '八公寓', orderAddress: '学子餐厅', foodItems: [FoodItem('干拌粉', 1), FoodItem('干拌粉', 1)], status: 1));
-
-      // pendingOrders.refresh();
       await fetchData();
     }  
   }
@@ -146,13 +141,14 @@ class OrderController extends GetxController {
         acceptedOrders.clear();
         for (var order in result['data']) {
           acceptedOrders.add(Order(
-            orderId: order['number'],
+            orderId: order['id'],
+            number: order['number'],
             deliveryTime: order['deliveryTime'],
             customerName: order['name'],
             customerPhone: order['cphone'],
             customerAddress: order['caddress'],
             orderAddress: order['maddress'],
-            foodItems: ((order['vos'] ?? []) as List).map((item) => FoodItem(item['dishName'], item['dishSales'])).toList(),
+            foodItems: ((order['ordersList'] ?? []) as List).map((item) => FoodItem(item['dishName'], item['dishSales'])).toList(),
             status: status,
             completeTime: order['completeTime'] ?? '', // TODO: 与后端沟通
           ));
@@ -163,11 +159,6 @@ class OrderController extends GetxController {
 
     if (isInitFetch) {
       if (!isAcceptedOrdersFetched) {
-        // acceptedOrders
-        //   ..add(Order(orderId: 5, deliveryTime: "12:00", customerName: '赵先生', customerPhone: '15423129451', customerAddress: '六公寓', orderAddress: '学子餐厅', foodItems: [FoodItem('干拌粉', 1), FoodItem('干拌粉', 1)], status: 1));
-          
-
-        // acceptedOrders.refresh();
         await fetchData();
         isAcceptedOrdersFetched = true;
 
@@ -175,13 +166,6 @@ class OrderController extends GetxController {
         return;
       }
     } else {
-      // acceptedOrders.clear();
-
-      // acceptedOrders
-      //   ..add(Order(orderId: 5, deliveryTime: "12:00", customerName: '赵先生', customerPhone: '15423129451', customerAddress: '六公寓', orderAddress: '学子餐厅', foodItems: [FoodItem('干拌粉', 1), FoodItem('干拌粉', 1)], status: 1));
-        
-
-      // acceptedOrders.refresh();
       fetchData();
     }
   }
@@ -224,13 +208,14 @@ class OrderController extends GetxController {
         deliveryingOrders.clear();
         for (var order in result['data']) {
           deliveryingOrders.add(Order(
-            orderId: order['number'],
+            orderId: order['id'],
+            number: order['number'],
             deliveryTime: order['deliveryTime'],
             customerName: order['name'],
             customerPhone: order['cphone'],
             customerAddress: order['caddress'],
             orderAddress: order['maddress'],
-            foodItems: ((order['vos'] ?? []) as List).map((item) => FoodItem(item['dishName'], item['dishSales'])).toList(),
+            foodItems: ((order['ordersList'] ?? []) as List).map((item) => FoodItem(item['dishName'], item['dishSales'])).toList(),
             status: status,
             completeTime: order['completeTime'] ?? '', // TODO: 与后端沟通
           ));
@@ -238,16 +223,7 @@ class OrderController extends GetxController {
         deliveryingOrders.refresh(); // 通知监听者
       }
 
-      // deliveryingOrders.clear();
-
-      // deliveryingOrders
-      //   ..add(Order(orderId: 1, deliveryTime: "12:00", customerName: '王先生', customerPhone: '18588602616', customerAddress: '八公寓', orderAddress: '学子餐厅', foodItems: [FoodItem('干拌粉', 1), FoodItem('干拌粉', 1), FoodItem('干拌粉', 1), FoodItem('干拌粉', 1)], status: 1))
-      //   ..add(Order(orderId: 2, deliveryTime: "12:00", customerName: '王先生', customerPhone: '18423129451', customerAddress: '八公寓', orderAddress: '学子餐厅', foodItems: [FoodItem('干拌粉', 1), FoodItem('干拌粉', 1)], status: 1))
-      //   ..add(Order(orderId: 3, deliveryTime: "12:00", customerName: '王先生', customerPhone: '18423129451', customerAddress: '八公寓', orderAddress: '学子餐厅', foodItems: [FoodItem('干拌粉', 1), FoodItem('干拌粉', 1)], status: 1));
-
       deliveryingOrders.refresh();
-
-
     }
 
     if (isInitFetch) {
@@ -302,13 +278,14 @@ class OrderController extends GetxController {
         completedOrders.clear();
         for (var order in result['data']) {
           completedOrders.add(Order(
-            orderId: order['number'],
+            orderId: order['id'],
+            number: order['number'],
             deliveryTime: order['deliveryTime'],
             customerName: order['name'],
             customerPhone: order['cphone'],
             customerAddress: order['caddress'],
             orderAddress: order['maddress'],
-            foodItems: ((order['vos'] ?? []) as List).map((item) => FoodItem(item['dishName'], item['dishSales'])).toList(),
+            foodItems: ((order['ordersList'] ?? []) as List).map((item) => FoodItem(item['dishName'], item['dishSales'])).toList(),
             status: status,
             completeTime: order['completeTime'] ?? '', // TODO: 与后端沟通
           ));
@@ -367,13 +344,14 @@ class OrderController extends GetxController {
         cancelledOrders.clear();
         for (var order in result['data']) {
           cancelledOrders.add(Order(
-            orderId: order['number'],
+            orderId: order['id'],
+            number: order['number'],
             deliveryTime: order['deliveryTime'],
             customerName: order['name'],
             customerPhone: order['cphone'],
             customerAddress: order['caddress'],
             orderAddress: order['maddress'],
-            foodItems: ((order['vos'] ?? []) as List).map((item) => FoodItem(item['dishName'], item['dishSales'])).toList(),
+            foodItems: ((order['ordersList'] ?? []) as List).map((item) => FoodItem(item['dishName'], item['dishSales'])).toList(),
             status: status,
             completeTime: order['completeTime'] ?? '', // TODO: 与后端沟通
           ));
@@ -396,7 +374,7 @@ class OrderController extends GetxController {
   }
 
   // 根据订单ID更新订单状态，并可选择是否同步更新服务器
-  Future<void> updateOrderStatus(RxList<Order> originList, String orderId, int newStatus, BuildContext ctx) async {
+  Future<void> updateOrderStatus(RxList<Order> originList, int orderId, int newStatus, BuildContext ctx, String successTitle, String successDesc) async {
     // 找到对应的订单
     int index = originList.indexWhere((order) => order.orderId == orderId);
 
@@ -429,7 +407,7 @@ class OrderController extends GetxController {
         secureStorage.write(key: 'accessToken', value: refreshData['data']['accessToken']);
         secureStorage.write(key: 'refreshToken', value: refreshData['data']['refreshToken']);
       }
-      updateOrderStatus(originList, orderId, newStatus, ctx); // 重新尝试更新
+      updateOrderStatus(originList, orderId, newStatus, ctx, successTitle, successDesc); // 重新尝试更新
       return;
     }
 
@@ -461,32 +439,7 @@ class OrderController extends GetxController {
       targetList.insert(0, order);
       originList.refresh(); // 通知监听者
       targetList.refresh(); // 通知监听者
+      showSnackBar(successTitle, successDesc, ContentType.success, ctx);
     }
-
-    // Order order = originList[index];
-    // originList.removeAt(index);
-    // RxList<Order> targetList = <Order>[].obs;
-    // switch (newStatus) {
-    //   case 1:
-    //     targetList = pendingOrders;
-    //     break;
-    //   case 2:
-    //     targetList = acceptedOrders;
-    //     break;
-    //   case 3:
-    //     targetList = deliveryingOrders;
-    //     break;
-    //   case 4:
-    //     targetList = completedOrders;
-    //     break;
-    //   case 5:
-    //     targetList = cancelledOrders;
-    //     break;
-    //   default:
-    //     break;
-    // }
-    // targetList.insert(0, order);
-    // originList.refresh(); // 通知监听者
-    // targetList.refresh(); // 通知监听者
   }
 }

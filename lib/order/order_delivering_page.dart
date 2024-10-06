@@ -1,7 +1,15 @@
+/// @Author: yl Future_YL@outlook.com
+/// @Date: 2024-09-20 
+/// @LastEditors: yl Future_YL@outlook.com
+/// @LastEditTime: 2024-10-06 16:16
+/// @FilePath: lib/order/order_delivering_page.dart
+/// @Description: 这是配送中订单页面
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 import 'order_card.dart';
@@ -22,17 +30,17 @@ class _OrderDeliveringPageState extends State<OrderDeliveringPage> with Automati
   @override
   void initState() {
     super.initState();
-    
-    getData();
+    Future.microtask(() async {
+      init(); // 保证在页面构建后初始化数据
+  });
   }
 
-  void getData() async {
-    // 初次加载时默认显示今日订单
-    DateTime now = DateTime.now();
-    DateTime start = DateTime(now.year, now.month, now.day);
-    final OrderController orderController = Get.find<OrderController>();
-
-    orderController.fetchDeliveryingOrders(start, now, null, context, isInitFetch: true);
+  void init() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _selectedDate = prefs.getString('deleverying_selectedDate') ?? '今日';
+    });
+    regetData();
   }
 
   void regetData() async {
@@ -74,8 +82,6 @@ class _OrderDeliveringPageState extends State<OrderDeliveringPage> with Automati
       context: context,
       builder: (BuildContext context) {
         return CupertinoActionSheet(
-          // title: const Text('联系用户'),
-          // message: const Text('请选择联系方式'),
           actions: <Widget>[
             CupertinoActionSheetAction(
               onPressed: () {
@@ -100,13 +106,6 @@ class _OrderDeliveringPageState extends State<OrderDeliveringPage> with Automati
               ),
             ),
           ],
-          // cancelButton: CupertinoActionSheetAction(
-          //   onPressed: () {
-          //     Navigator.pop(context);
-          //   },
-          //   isDefaultAction: true,
-          //   child: const Text('取消'),
-          // ),
         );
       },
     );
@@ -130,10 +129,12 @@ class _OrderDeliveringPageState extends State<OrderDeliveringPage> with Automati
                     child: Text(value),
                   );
                 }).toList(),
-                onChanged: (value) {
+                onChanged: (value) async {
                   // 实现下拉框选择后的逻辑
+                  final SharedPreferences prefs = await SharedPreferences.getInstance();
+                  prefs.setString('deleverying_selectedDate', value!);
                   setState(() {
-                    _selectedDate = value!;
+                    _selectedDate = value;
                     regetData();
                   });
                 },
@@ -186,6 +187,7 @@ class _OrderDeliveringPageState extends State<OrderDeliveringPage> with Automati
                   var order = orderController.deliveryingOrders[index];
                   return OrderCardWithButton(
                     orderId: order.orderId,
+                    number: order.number,
                     deliveryTime: order.deliveryTime,
                     customerName: order.customerName,
                     customerAddress: order.customerAddress,
@@ -195,7 +197,7 @@ class _OrderDeliveringPageState extends State<OrderDeliveringPage> with Automati
                     foodItems: order.foodItems,
                     onFrontButtonPressed: () {
                       // 更新订单状态为 completed
-                      orderController.updateOrderStatus(orderController.deliveryingOrders, order.orderId, 4, context);
+                      orderController.updateOrderStatus(orderController.deliveryingOrders, order.orderId, 4, context, '送达成功', '');
                     },
                     onRearButtonPressed: () => _showContactOptions(context, '+86', order.customerPhone),
                     customerPhone: order.customerPhone,

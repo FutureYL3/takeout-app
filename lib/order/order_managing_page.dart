@@ -1,3 +1,11 @@
+/// @Author: yl Future_YL@outlook.com
+/// @Date: 2024-09-20 
+/// @LastEditors: yl Future_YL@outlook.com
+/// @LastEditTime: 2024-10-03 12:45
+/// @FilePath: lib/order/order_managing_page.dart
+/// @Description: 这是订单管理模块的页面框架
+
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
