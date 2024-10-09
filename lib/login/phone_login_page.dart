@@ -130,7 +130,7 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.all(Radius.circular(20))
                                   ),
-                                ),
+                                ),keyboardType: TextInputType.phone,
                                 controller: _phoneController,
                                 validator: (value) {
                                   RegExp regTel = RegExp(r'^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$');
@@ -159,6 +159,7 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
                                           borderRadius: BorderRadius.all(Radius.circular(20))
                                         )
                                       ),
+                                      keyboardType: TextInputType.number,
                                       controller: _codeController,
                                       validator: (value) {
                                         if (value!.isEmpty) {

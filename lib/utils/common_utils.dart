@@ -59,8 +59,13 @@ class CommonUtilsApiService {
 
       // 返回响应数据
       return response.data;
-    } on DioException {
+    } on DioException catch (e) {
       // 处理 Dio 的错误
+      print('Dio Error: ${e.message}');
+      if (e.response != null) {
+        print('Response data: ${e.response?.data}');
+        print('Response headers: ${e.response?.headers}');
+      }
       return {
         'error': true
       };
