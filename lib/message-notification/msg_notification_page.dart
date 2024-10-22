@@ -35,7 +35,7 @@ class _MsgNotificationPageState extends State<MsgNotificationPage> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.school),
-            label: '私信与通知',
+            label: '通知与申诉',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.school),
