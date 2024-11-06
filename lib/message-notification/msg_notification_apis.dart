@@ -11,13 +11,13 @@ import 'package:intl/intl.dart';
 import '../utils/common_utils.dart';
 import '../welcome/welcome_page.dart';
 
-class HomeApiService {
+class MsgNotificationApiService {
   final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
   static const String baseUrl = 'http://114.55.108.97:8080';
   // static const String baseUrl = 'http://47.99.35.140:8080';
   late Dio dio;
 
-  HomeApiService() {
+  MsgNotificationApiService() {
     BaseOptions options = BaseOptions(
       baseUrl: baseUrl,
       connectTimeout: const Duration(seconds: 10),
@@ -57,63 +57,5 @@ class HomeApiService {
       },
     ));
   }
-
-  // false 表示离线，true 表示在线
-  Future<Map<String, dynamic>> updateMyOnlineStatus(bool status, BuildContext ctx) async {
-    try {
-      Response response = await dio.post('/courier/static/changePersonstatus', data: {
-        'status': status
-      });
-
-      return response.data;
-    } on DioException catch (e) {
-      // 处理 Dio 的错误
-      showSnackBar('更新外卖员配送状态失败', e.message!, ContentType.failure, ctx);
-      return {};
-    }
-  }
-
-  Future<Map<String, dynamic>> getStatisticsInfo(DateTime date, BuildContext ctx) async {
-    String formattedDate = DateFormat('yyyy-MM-dd').format(date);
-    try {
-      Response response = await dio.get('/courier/static/staticInfo', queryParameters: {
-        'date': formattedDate
-      });
-
-      return response.data;
-    } on DioException catch (e) {
-      // 处理 Dio 的错误
-      showSnackBar('获取首页统计数据失败', e.message!, ContentType.failure, ctx);
-      return {};
-    }
-  }
-
-  Future<Map<String, dynamic>> getSystemNotification(BuildContext ctx) async {
-    try {
-      Response response = await dio.get('/courier/systemNotifications');
-
-      return response.data;
-    } on DioException catch (e) {
-      // 处理 Dio 的错误
-      showSnackBar('获取系统通知失败', e.message!, ContentType.failure, ctx);
-      return {};
-    }
-  }
-
-  Future<Map<String, dynamic>> getDeliveryingOrders(DateTime date, BuildContext ctx) async {
-    String formattedDate = DateFormat('yyyy-MM-dd').format(date);
-    try {
-      Response response = await dio.post('/courier/static/getDeliveryOrders', data: {
-        'date': formattedDate
-      });
-
-      return response.data;
-    } on DioException catch (e) {
-      // 处理 Dio 的错误
-      showSnackBar('获取正在配送订单信息失败', e.message!, ContentType.failure, ctx);
-      return {};
-    }
-  }
-
 
 }

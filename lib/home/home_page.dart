@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:kssdt/home/deliverying_order_card.dart';
 import 'package:kssdt/home/statistics_model.dart';
 
 import '../message-notification/msg_notification_page.dart';
@@ -18,9 +19,9 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
   bool isOnline = true;
-  List<DeliveryingOrder> deliveryingOrders = []; 
+  List<DeliveryingOrder> deliveryingOrders = [DeliveryingOrder(customerName: '孙先生', deliveryAddr: '学子餐厅', mapUrl: 'https://bbs-pic.datacourse.cn/forum/202205/15/122133oxzlhoolhcsxp6so.jpg')]; 
   List<String> systemNotifications = [];
-  late Statistics statistics;
+  Statistics? statistics;
   final HomeApiService homeApiService = HomeApiService();
 
   void changeOnlineStatus(bool status) async {
@@ -73,6 +74,9 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
+    // getStatistics();
+    // getDeliveryingOrders();
+    // getSystemNotification();
     super.initState();
   }
 
@@ -96,92 +100,90 @@ class _HomePageState extends State<HomePage> {
         centerTitle: true,
         automaticallyImplyLeading: false,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Divider(),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    changeOnlineStatus(true);
-                  },
-                  child: const Row(
-                    children: [
-                      Icon(Icons.play_arrow),
-                      SizedBox(width: 5),
-                      Text('开始接单'),
-                    ],
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    changeOnlineStatus(false);
-                  },
-                  child: const Row(
-                    children: [
-                      Icon(Icons.stop),
-                      SizedBox(width: 5),
-                      Text('停止接单'),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildStatistic('今日已接单', statistics.acceptedOrdersToday.toString(), '比昨日${statistics.isOrderIncreased ? '↑' : '↓'}${statistics.compareYesterdayOrderNum}'),
-                _buildStatistic('预计今日收入', statistics.estimatedIncomeToday.toString(), '比昨日${statistics.isIncomeIncreased ? '↑' : '↓'}${statistics.compareYesterdayIncome}'),
-                _buildStatistic('本月总收入', statistics.totalIncomeThisMonth.toString(), '比昨日${statistics.isMonthIncomeIncreased ? '↑' : '↓'}${statistics.compareLastMonthIncome}'),
-              ],
-            ),
-            Container(
-              margin: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Divider(),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  const Text('系统通知'),
-                  Container(
-                    color: Colors.grey[200],
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: systemNotifications.map((e) => Text(e)).toList(),
+                  ElevatedButton(
+                    onPressed: () {
+                      changeOnlineStatus(true);
+                    },
+                    child: const Row(
+                      children: [
+                        Icon(Icons.play_arrow),
+                        SizedBox(width: 5),
+                        Text('开始接单'),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  const Text('正在配送'),
-                  ListView.builder(
-                    itemCount: deliveryingOrders.length,
-                    itemBuilder: (context, index) {
-                      final order = deliveryingOrders[index];
-
-                      return Card(
-                        child: ListTile(
-                          title: Text('${order.customerName} ${order.deliveryAddr}'),
-                          subtitle: Container(
-                            margin: const EdgeInsets.only(top: 10),
-                            color: Colors.grey[300],
-                            height: 150,
-                            child: Center(
-                              child: Image.network(order.mapUrl, width: 200, height: 150, fit: BoxFit.cover)
-                            ),
-                          ),
-                        ),
-                      );
+                  ElevatedButton(
+                    onPressed: () {
+                      changeOnlineStatus(false);
                     },
-                  )
+                    child: const Row(
+                      children: [
+                        Icon(Icons.stop),
+                        SizedBox(width: 5),
+                        Text('停止接单'),
+                      ],
+                    ),
+                  ),
                 ],
               ),
-            )
-          ],
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  // _buildStatistic('今日已接单', statistics!.acceptedOrdersToday.toString(), '比昨日${statistics!.isOrderIncreased ? '↑' : '↓'}${statistics!.compareYesterdayOrderNum}'),
+                  // _buildStatistic('预计今日收入', statistics!.estimatedIncomeToday.toString(), '比昨日${statistics!.isIncomeIncreased ? '↑' : '↓'}${statistics!.compareYesterdayIncome}'),
+                  // _buildStatistic('本月总收入', statistics!.totalIncomeThisMonth.toString(), '比昨日${statistics!.isMonthIncomeIncreased ? '↑' : '↓'}${statistics!.compareLastMonthIncome}'),
+
+                  _buildStatistic('今日已接单', "99", '比昨日↑ 99'),
+                  _buildStatistic('预计今日收入', "99", '比昨日↑ 99'),
+                  _buildStatistic('本月总收入', "99", '比昨日↑ 99'),
+                ],
+              ),
+              Container(
+                margin: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('系统通知'),
+                    Container(
+                      color: Colors.grey[200],
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: systemNotifications.map((e) => Text(e)).toList(),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    const Text('正在配送'),
+                    
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: deliveryingOrders.length,
+                      itemBuilder: (context, index) {
+                        final order = deliveryingOrders[index];
+
+                        return DeliveryOrderCard(order: order);
+                      },
+                      
+                    )
+                  ],
+                ),
+              )
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(

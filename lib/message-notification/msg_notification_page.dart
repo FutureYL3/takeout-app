@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import '../home/home_page.dart';
 import '../order/order_managing_page.dart';
 import '../personal-info/personal_center_page.dart';
+import 'order_complaint_page.dart';
+import 'sys_notification_page.dart';
 
 class MsgNotificationPage extends StatefulWidget {
   const MsgNotificationPage({super.key});
@@ -15,12 +17,63 @@ class MsgNotificationPage extends StatefulWidget {
 class _MsgNotificationPageState extends State<MsgNotificationPage> {
   int _selectedIndex = 2;
 
+  int _selectedTabIndex = 0;
+
+  final List<Widget> _pages = [
+    const NotificationsPage(),
+    const ComplaintsPage(),
+  ];
+
+  void _onTabSelected(int index) {
+    setState(() {
+      _selectedTabIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
-      body:  const Center(
-        child: Text("私信与通知页面"),
+      appBar: AppBar(
+        title: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('xxxxxx外卖端'),
+            SizedBox(width: 10),
+            Text(
+              '在线',
+              style: TextStyle(fontSize: 14, color: Colors.grey),
+            ),
+            Icon(Icons.circle, color: Colors.green, size: 10),
+          ],
+        ),
+        centerTitle: true,
+        automaticallyImplyLeading: false,
+      ),
+      body: Row(
+        children: [
+          NavigationRail(
+            selectedIndex: _selectedTabIndex,
+            onDestinationSelected: _onTabSelected,
+            labelType: NavigationRailLabelType.all,
+            destinations: const [
+              NavigationRailDestination(
+                icon: Icon(Icons.notifications),
+                label: Text('通知'),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.assignment),
+                label: Text('申诉'),
+              ),
+            ],
+          ),
+          const VerticalDivider(thickness: 1, width: 1),
+          Expanded(
+            child: Align(
+              alignment: Alignment.topCenter, // 确保内容靠上对齐
+              child: _pages[_selectedTabIndex],
+            ),
+          ),
+        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.grey,
