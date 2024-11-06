@@ -5,17 +5,14 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart' hide Response, FormData, MultipartFile;
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 
-import '../dto/personal_info_dto.dart';
 import '../utils/common_utils.dart';
 import '../welcome/welcome_page.dart';
 
 class HomeApiService {
-  final FlutterSecureStorage  secureStorage = const FlutterSecureStorage();
+  final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
   static const String baseUrl = 'http://114.55.108.97:8080';
   // static const String baseUrl = 'http://47.99.35.140:8080';
   late Dio dio;
@@ -61,15 +58,62 @@ class HomeApiService {
     ));
   }
 
-  // 0 表示离线，1 表示在线
-  // Future<Map<String, dynamic>> updateMyOnlineStatus(bool status, BuildContext ctx) async {
-  //   try {
-      
-  //   } on DioException catch (e) {
-  //     showSnackBar('登录失败', e.message!, ContentType.failure, ctx);
-  //     return {};
-  //   }
-  // }
+  // false 表示离线，true 表示在线
+  Future<Map<String, dynamic>> updateMyOnlineStatus(bool status, BuildContext ctx) async {
+    try {
+      Response response = await dio.put('xxx', data: {
+        'status': status
+      });
+
+      return response.data;
+    } on DioException catch (e) {
+      // 处理 Dio 的错误
+      showSnackBar('更新外卖员配送状态失败', e.message!, ContentType.failure, ctx);
+      return {};
+    }
+  }
+
+  Future<Map<String, dynamic>> getStatisticsInfo(DateTime date, BuildContext ctx) async {
+    String formattedDate = DateFormat('yyyy-MM-dd').format(date);
+    try {
+      Response response = await dio.put('xxx', data: {
+        'date': formattedDate
+      });
+
+      return response.data;
+    } on DioException catch (e) {
+      // 处理 Dio 的错误
+      showSnackBar('获取首页统计数据失败', e.message!, ContentType.failure, ctx);
+      return {};
+    }
+  }
+
+  Future<Map<String, dynamic>> getSystemNotification(BuildContext ctx) async {
+    try {
+      Response response = await dio.put('xxx');
+
+      return response.data;
+    } on DioException catch (e) {
+      // 处理 Dio 的错误
+      showSnackBar('获取系统通知失败', e.message!, ContentType.failure, ctx);
+      return {};
+    }
+  }
+
+  Future<Map<String, dynamic>> getDeliveryingOrders(DateTime date, BuildContext ctx) async {
+    String formattedDate = DateFormat('yyyy-MM-dd').format(date);
+    try {
+      Response response = await dio.put('xxx', data: {
+        'date': formattedDate
+      });
+
+      return response.data;
+    } on DioException catch (e) {
+      // 处理 Dio 的错误
+      showSnackBar('获取正在配送订单信息失败', e.message!, ContentType.failure, ctx);
+      return {};
+    }
+  }
 
 
 }

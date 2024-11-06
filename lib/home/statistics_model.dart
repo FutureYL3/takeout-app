@@ -20,4 +20,18 @@ class Statistics {
     required this.isIncomeIncreased,
     required this.isMonthIncomeIncreased,
   });
+
+  static Statistics fromJson(response) {
+    return Statistics(
+      acceptedOrdersToday: response['acceptedOrdersToday'],
+      compareYesterdayOrderNum: response['compareYesterdayOrderNum'],
+      estimatedIncomeToday: response['estimatedIncomeToday'],
+      compareYesterdayIncome: response['compareYesterdayIncome'],
+      totalIncomeThisMonth: response['totalIncomeThisMonth'],
+      compareLastMonthIncome: response['compareLastMonthIncome'],
+      isOrderIncreased: response['isOrderIncreased'],
+      isIncomeIncreased: response['isIncomeIncreased'],
+      isMonthIncomeIncreased: response['isMonthIncomeIncreased'],
+    );
+  }
 }
