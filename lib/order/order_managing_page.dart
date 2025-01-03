@@ -8,12 +8,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 import '../home/home_page.dart';
 import '../message-notification/msg_notification_page.dart';
 import '../personal-info/personal_center_page.dart';
-import 'order_accepted_page.dart';
+// import 'order_accepted_page.dart';
 import 'order_cancelled_page.dart';
 import 'order_completed_page.dart';
 import 'order_delivering_page.dart';
@@ -29,24 +30,42 @@ class OrderManagingPage extends StatefulWidget {
 class _OrderManagingPageState extends State<OrderManagingPage> {
   int _selectedIndex = 1;
   int _selectedItem = 0;
+  bool? isOnline = false;
 
   // 存储已经加载的页面
   final Map<int, Widget> _loadedPages = {};
+
+  void getOnlineStatus() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool? status = prefs.getBool('onlineStatus');
+
+    if (status != null) {
+      setState(() {
+        isOnline = status;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    getOnlineStatus();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Row(
+        title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('xxxxxx外卖端'),
-            SizedBox(width: 10),
+            const Text('康食速点通 外卖端'),
+            const SizedBox(width: 10),
             Text(
-              '在线',
-              style: TextStyle(fontSize: 14, color: Colors.grey),
+              isOnline! ? '在线' : '离线',
+              style: const TextStyle(fontSize: 14, color: Colors.grey),
             ),
-            Icon(Icons.circle, color: Colors.green, size: 10),
+            isOnline! ? const Icon(Icons.circle, color: Colors.green, size: 10) : const Icon(Icons.circle, color: Colors.grey, size: 10),
           ],
         ),
         centerTitle: true,
@@ -61,7 +80,7 @@ class _OrderManagingPageState extends State<OrderManagingPage> {
             child: ListView(
               children: [
                 _buildMenuItem('待处理', 0),
-                _buildMenuItem('已接单', 1),
+                // _buildMenuItem('已接单', 1),
                 _buildMenuItem('配送中', 2),
                 _buildMenuItem('已完成', 3),
                 _buildMenuItem('已取消', 4)
@@ -135,9 +154,9 @@ class _OrderManagingPageState extends State<OrderManagingPage> {
       case 0:
         _loadedPages[index] = const OrderPendingPage();
         break;
-      case 1:
-        _loadedPages[index] = const OrderAcceptedPage();
-        break;
+      // case 1:
+      //   _loadedPages[index] = const OrderAcceptedPage();
+      //   break;
       case 2:
         _loadedPages[index] = const OrderDeliveringPage();
         break;

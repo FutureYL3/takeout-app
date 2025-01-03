@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import './msg_notification_apis.dart';
+import 'sys_notification_model.dart';
 
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({super.key});
@@ -10,6 +12,27 @@ class NotificationsPage extends StatefulWidget {
 class _NotificationsPageState extends State<NotificationsPage> {
   String _selectedDate = '今日';
   final TextEditingController _searchController = TextEditingController();
+  final MsgNotificationApiService msgNotificationApiService = MsgNotificationApiService();
+  List<SysNotification> sysNotification = [];
+
+  void getSysNotification() async {
+    Map<String, dynamic> response = await msgNotificationApiService.getSystemNotifications(_selectedDate, _searchController.text, context);
+
+    if (response['code'] == 1) {
+      List<dynamic> data = response['data'];
+      List<SysNotification> notifications = data.map((e) => SysNotification(title: e['title'], content: e['content'], releaseTime: e['releaseTime'])).toList();
+
+      setState(() {
+        sysNotification = notifications;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getSysNotification();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +59,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
                     setState(() {
                       _selectedDate = value!;
                     });
+
+                    getSysNotification();
                   },
                 ),
                 const Spacer(),
@@ -52,7 +77,9 @@ class _NotificationsPageState extends State<NotificationsPage> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: GestureDetector(
-                          onTap: () {}, 
+                          onTap: () async {
+                            getSysNotification();
+                          }, 
                           child: const Icon(Icons.search),
                         )
                       ),
@@ -60,7 +87,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                         child: TextField(
                           decoration: const InputDecoration(
                             border: InputBorder.none,
-                            hintText: '搜索订单',
+                            hintText: '搜索通知',
                           ),
                           controller: _searchController,
                         ),
@@ -73,19 +100,22 @@ class _NotificationsPageState extends State<NotificationsPage> {
             const SizedBox(height: 20),
             ListView(
               shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              children: const [
-                ListTile(
-                  leading: Icon(Icons.settings),
-                  title: Text('系统公告'),
-                  subtitle: Text('哈哈哈哈哈哈哈哈哈哈...'),
-                  trailing: Text('13:58'),
-                ),
-              ],
+              // physics: const NeverScrollableScrollPhysics(),
+              children: sysNotification.map((e) => ListTile(
+                title: Text(e.title),
+                subtitle: Text(e.content),
+                trailing: Text(e.releaseTime),
+              )).toList(),
             )
           ],
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _searchController.dispose();
   }
 }

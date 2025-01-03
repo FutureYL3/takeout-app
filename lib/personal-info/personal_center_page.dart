@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../home/home_page.dart';
 import '../message-notification/msg_notification_page.dart';
@@ -20,6 +21,7 @@ class PersonalCenterPage extends StatefulWidget {
 class _PersonalCenterPageState extends State<PersonalCenterPage> {
   int _selectedIndex = 3;
   int _selectedItem = 0;
+  bool? isOnline = false;
 
   final List<Widget> _pages = [
     const PersonalInfoPage(),
@@ -29,20 +31,37 @@ class _PersonalCenterPageState extends State<PersonalCenterPage> {
     const AreaManagementPage()
   ];
 
+  void getOnlineStatus() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool? status = prefs.getBool('onlineStatus');
+
+    if (status != null) {
+      setState(() {
+        isOnline = status;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    getOnlineStatus();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Row(
+        title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('xxxxxx外卖端'),
-            SizedBox(width: 10),
+            const Text('康食速点通 外卖端'),
+            const SizedBox(width: 10),
             Text(
-              '在线',
-              style: TextStyle(fontSize: 14, color: Colors.grey),
+              isOnline! ? '在线' : '离线',
+              style: const TextStyle(fontSize: 14, color: Colors.grey),
             ),
-            Icon(Icons.circle, color: Colors.green, size: 10),
+            isOnline! ? const Icon(Icons.circle, color: Colors.green, size: 10) : const Icon(Icons.circle, color: Colors.grey, size: 10),
           ],
         ),
         centerTitle: true,

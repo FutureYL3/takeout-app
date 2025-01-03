@@ -5,7 +5,9 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart' hide Response, FormData, MultipartFile;
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 
 import '../utils/common_utils.dart';
@@ -57,5 +59,169 @@ class MsgNotificationApiService {
       },
     ));
   }
+
+  Future<Map<String, dynamic>> getSystemNotifications(String dateRange, String like, BuildContext ctx) async {
+    DateTime now = DateTime.now();
+    DateTime start = now;
+    switch (dateRange) {
+      case '本日':
+        start = DateTime(now.year, now.month, now.day);
+        break;
+      case '近7天':
+        start = now.subtract(const Duration(days: 7));
+        break;
+      case '近30天':
+        start = now.subtract(const Duration(days: 30));
+        break;
+      case '今年':
+        start = DateTime(now.year, 1, 1);
+        break;
+    }
+    
+    // 时间日期格式化为yyyy-MM-dd
+    String begin = DateFormat('yyyy-MM-dd').format(start);
+    String end = DateFormat('yyyy-MM-dd').format(now);
+    
+    try {
+      Response response = await dio.post('/courier/notice/getNotice', data: {
+        'beginDate': begin,
+        'endDate': end,
+        'content': like
+      });
+
+      return response.data;
+    } on DioException catch (e) {
+      // 处理 Dio 的错误
+      showSnackBar('获取系统通知失败', e.message!, ContentType.failure, ctx);
+      return {};
+    }
+  }
+
+  Future<Map<String, dynamic>> getUserComplaints(String dateRange, String like, BuildContext ctx) async {
+    DateTime now = DateTime.now();
+    DateTime start = now;
+    switch (dateRange) {
+      case '本日':
+        start = DateTime(now.year, now.month, now.day);
+        break;
+      case '近7天':
+        start = now.subtract(const Duration(days: 7));
+        break;
+      case '近30天':
+        start = now.subtract(const Duration(days: 30));
+        break;
+      case '今年':
+        start = DateTime(now.year, 1, 1);
+        break;  
+    }
+    
+    // 时间日期格式化为yyyy-MM-dd
+    String begin = DateFormat('yyyy-MM-dd').format(start);
+    String end = DateFormat('yyyy-MM-dd').format(now);
+
+    try {
+      Response response = await dio.post('/courier/notice/getComplaints', data: {
+        'beginDate': begin,
+        'endDate': end,
+        'content': like
+      });
+
+      return response.data;
+    } on DioException catch (e) {
+      // 处理 Dio 的错误
+      showSnackBar('获取用户投诉失败', e.message!, ContentType.failure, ctx);
+      return {};
+    }
+  }
+
+  Future<Map<String, dynamic>> acceptComplaint(int id, BuildContext ctx) async {
+    try {
+      Response response = await dio.post('/courier/notice/AcceptComplaints', queryParameters: {
+        'id': id
+      });
+
+      return response.data;
+    } on DioException catch (e) {
+      // 处理 Dio 的错误
+      showSnackBar('接受投诉失败', e.message!, ContentType.failure, ctx);
+      return {};
+    }
+  }
+
+  Future<Map<String, dynamic>> submitAppeal(int id, String content, List<String> imageList, BuildContext ctx) async {
+    try {
+      Response response = await dio.post('/courier/notice/CourierComplaintAppeal', data: {
+        'id': id,
+        'content': content,
+        'imagesList': imageList
+      });
+
+      return response.data;
+    } on DioException catch (e) {
+      // 处理 Dio 的错误
+      showSnackBar('接受投诉失败', e.message!, ContentType.failure, ctx);
+      return {};
+    }
+  }
+
+  Future<void> _requestPermissions() async {
+    var status = await Permission.photos.status;
+    if (!status.isGranted) {
+      await Permission.photos.request(); // 请求访问相册权限
+    }
+  }  
+
+  Future<void> uploadImage(List<String> imagesList, BuildContext ctx) async {
+    await _requestPermissions(); // 请求权限
+
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+
+    if (image != null) {
+      try {
+        // 构建 FormData
+        FormData formData = FormData.fromMap({
+          'image': await MultipartFile.fromFile(image.path),
+        });
+        // print(formData);
+        // print(image.path);
+
+        // 发送 POST 请求
+        Response response = await dio.post('/courier/uploadImage', data: formData, 
+          options: Options(
+            headers: {
+              'Content-Type': 'multipart/form-data',  // 设置 Content-Type
+            },
+        ),);
+
+        // 处理响应
+        Map<String, dynamic> result = response.data;
+        // print(result);
+
+        if (result['code'] == 1) {
+          // 上传成功
+          // print(result);
+          imagesList.add(result['data']);
+          showSnackBar('上传成功', '成功上传了头像', ContentType.success, ctx);
+        } else {
+          // 上传失败
+          showSnackBar('上传失败', result['msg'], ContentType.failure, ctx);
+        }
+      } on DioException catch (e) {
+        // 处理 Dio 的错误并反馈给用户
+        // print(e.message);
+        showSnackBar('上传失败', 'Failed to upload image: ${e.message}', ContentType.failure, ctx);
+      } catch (e) {
+        // 处理其他潜在的错误
+        // print(e.toString());
+        showSnackBar('上传失败', 'An unknown error occurred: ${e.toString()}', ContentType.failure, ctx);
+      }
+    } else {
+      // 没有选择图片时的处理
+      showSnackBar('未选择图片', '请先选择一张图片再上传', ContentType.warning, ctx);
+    }
+  }
+
+
 
 }

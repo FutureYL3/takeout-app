@@ -61,7 +61,7 @@ class HomeApiService {
   // false 表示离线，true 表示在线
   Future<Map<String, dynamic>> updateMyOnlineStatus(bool status, BuildContext ctx) async {
     try {
-      Response response = await dio.post('/courier/static/changePersonstatus', data: {
+      Response response = await dio.post('/courier/statistics/changePersonStatus', data: {
         'status': status
       });
 
@@ -69,6 +69,7 @@ class HomeApiService {
     } on DioException catch (e) {
       // 处理 Dio 的错误
       showSnackBar('更新外卖员配送状态失败', e.message!, ContentType.failure, ctx);
+      print(e.message);
       return {};
     }
   }
@@ -76,9 +77,8 @@ class HomeApiService {
   Future<Map<String, dynamic>> getStatisticsInfo(DateTime date, BuildContext ctx) async {
     String formattedDate = DateFormat('yyyy-MM-dd').format(date);
     try {
-      Response response = await dio.get('/courier/static/staticInfo', queryParameters: {
-        'date': formattedDate
-      });
+      Response response = await dio.get('/courier/statistics/staticInfo/$formattedDate');
+      print("/courier/statistics/staticInfo/$formattedDate");
 
       return response.data;
     } on DioException catch (e) {
@@ -103,7 +103,7 @@ class HomeApiService {
   Future<Map<String, dynamic>> getDeliveryingOrders(DateTime date, BuildContext ctx) async {
     String formattedDate = DateFormat('yyyy-MM-dd').format(date);
     try {
-      Response response = await dio.post('/courier/static/getDeliveryOrders', data: {
+      Response response = await dio.get('/courier/statistics/getDeliveryOrders', data: {
         'date': formattedDate
       });
 

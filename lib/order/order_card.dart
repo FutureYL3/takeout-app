@@ -70,7 +70,7 @@ class _OrderCardWithButtonState extends State<OrderCardWithButton> {
                   ),
                 ),
                 const SizedBox(width: 10),
-                Text("${widget.deliveryTime.split("T")[0].substring(5, 10)}  ${widget.deliveryTime.split("T")[1].substring(0, 5)}"),
+                widget.deliveryTime == '' ? const Text("错误")  : Text("${widget.deliveryTime.split("T")[0].substring(5, 10)}  ${widget.deliveryTime.split("T")[1].substring(0, 5)}"),
                 const Spacer(),
                 
               ],
@@ -202,7 +202,7 @@ class _OrderCardWithoutButtonState extends State<OrderCardWithoutButton> {
                   ),
                 ),
                 const SizedBox(width: 10),
-                Text("${widget.deliveryTime.split("T")[0].substring(5, 10)}  ${widget.deliveryTime.split("T")[1].substring(0, 5)}"),
+                widget.deliveryTime == '' ? const Text("错误")  : Text("${widget.deliveryTime.split("T")[0].substring(5, 10)}  ${widget.deliveryTime.split("T")[1].substring(0, 5)}"),
                 const Spacer(),
                 Text(widget.completeTime ?? ''),
                 Text(widget.hintText)

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kssdt/home/deliverying_order_card.dart';
 import 'package:kssdt/home/statistics_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../message-notification/msg_notification_page.dart';
 import '../order/order_managing_page.dart';
@@ -18,19 +19,22 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
-  bool isOnline = true;
-  List<DeliveryingOrder> deliveryingOrders = [DeliveryingOrder(customerName: '孙先生', deliveryAddr: '学子餐厅', mapUrl: 'https://bbs-pic.datacourse.cn/forum/202205/15/122133oxzlhoolhcsxp6so.jpg')]; 
-  List<String> systemNotifications = [];
+  bool isOnline = false;
+  // List<DeliveryingOrder>? deliveryingOrders = [DeliveryingOrder(customerName: '孙先生', deliveryAddr: '学子餐厅', mapUrl: 'https://bbs-pic.datacourse.cn/forum/202205/15/122133oxzlhoolhcsxp6so.jpg')]; 
+  List<DeliveryingOrder>? deliveryingOrders; 
+  List<String>? systemNotifications = [];
   Statistics? statistics;
   final HomeApiService homeApiService = HomeApiService();
 
   void changeOnlineStatus(bool status) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
     Map<String, dynamic> response = await homeApiService.updateMyOnlineStatus(status, context);
 
     if (response['code'] == 1) {
       setState(() {
         isOnline = status;
       });
+      await prefs.setBool('onlineStatus', status);
     }
   }
 
@@ -39,9 +43,11 @@ class _HomePageState extends State<HomePage> {
     Map<String, dynamic> response = await homeApiService.getStatisticsInfo(now, context);
 
     if (response['code'] == 1) {
+      // print(response['data']);
       setState(() {
         statistics = Statistics.fromJson(response['data']);
       });
+      // print(statistics.toString());
     }
   }
 
@@ -51,8 +57,8 @@ class _HomePageState extends State<HomePage> {
 
     if (response['code'] == 1) {
       List<dynamic> data = response['data'];
-      List<DeliveryingOrder> orders = data.map((e) => DeliveryingOrder(customerName: e['customerName'], deliveryAddr: e['deliveryAddr'], mapUrl: e['mapUrl'])).toList();
-
+      List<DeliveryingOrder> orders = data.map((e) => DeliveryingOrder(customerName: e['name'], deliveryAddr: e['caddress'], mapUrl: /*e['mapUrl']*/"")).toList();
+      print(orders);
       setState(() {
         deliveryingOrders = orders;
       });
@@ -65,36 +71,72 @@ class _HomePageState extends State<HomePage> {
     if (response['code'] == 1) {
       List<dynamic> data = response['data'];
       List<String> notifications = data.map((e) => e.toString()).toList();
-
       setState(() {
         systemNotifications = notifications;
       });
     }
   }
 
+  void getOnlineStatus() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool? status = prefs.getBool('onlineStatus');
+
+    if (status != null) {
+      setState(() {
+        isOnline = status;
+      });
+    } else {
+      await prefs.setBool('onlineStatus', isOnline);
+    }
+  }
+
   @override
   void initState() {
-    // getStatistics();
-    // getDeliveryingOrders();
+    getStatistics();
+    getDeliveryingOrders();
     // getSystemNotification();
+    getOnlineStatus();
     super.initState();
   }
 
 
   @override
   Widget build(BuildContext context) {
+    // 确保数据加载完成才显示页面
+    if (statistics == null || deliveryingOrders == null || systemNotifications == null) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text('康食速点通 外卖端'),
+              const SizedBox(width: 10),
+              Text(
+                isOnline ? '在线' : '离线',
+                style: const TextStyle(fontSize: 14, color: Colors.grey),
+              ),
+              isOnline ? const Icon(Icons.circle, color: Colors.green, size: 10) : const Icon(Icons.circle, color: Colors.grey, size: 10),
+            ],
+          ),
+          centerTitle: true,
+          automaticallyImplyLeading: false,
+        ),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
-        title: const Row(
+        title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('xxxxxx外卖端'),
-            SizedBox(width: 10),
+            const Text('康食速点通 外卖端'),
+            const SizedBox(width: 10),
             Text(
-              '在线',
-              style: TextStyle(fontSize: 14, color: Colors.grey),
+              isOnline ? '在线' : '离线',
+              style: const TextStyle(fontSize: 14, color: Colors.grey),
             ),
-            Icon(Icons.circle, color: Colors.green, size: 10),
+            isOnline ? const Icon(Icons.circle, color: Colors.green, size: 10) : const Icon(Icons.circle, color: Colors.grey, size: 10),
           ],
         ),
         centerTitle: true,
@@ -141,13 +183,13 @@ class _HomePageState extends State<HomePage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  // _buildStatistic('今日已接单', statistics!.acceptedOrdersToday.toString(), '比昨日${statistics!.isOrderIncreased ? '↑' : '↓'}${statistics!.compareYesterdayOrderNum}'),
-                  // _buildStatistic('预计今日收入', statistics!.estimatedIncomeToday.toString(), '比昨日${statistics!.isIncomeIncreased ? '↑' : '↓'}${statistics!.compareYesterdayIncome}'),
-                  // _buildStatistic('本月总收入', statistics!.totalIncomeThisMonth.toString(), '比昨日${statistics!.isMonthIncomeIncreased ? '↑' : '↓'}${statistics!.compareLastMonthIncome}'),
+                  _buildStatistic('今日已接单', statistics!.acceptedOrdersToday.toString(), '比昨日${statistics!.isOrderIncreased ? '↑' : '↓'}${statistics!.compareYesterdayOrderNum}'),
+                  _buildStatistic('预计今日收入', statistics!.estimatedIncomeToday.toString(), '比昨日${statistics!.isIncomeIncreased ? '↑' : '↓'}${statistics!.compareYesterdayIncome}'),
+                  _buildStatistic('本月总收入', statistics!.totalIncomeThisMonth.toString(), '比昨日${statistics!.isMonthIncomeIncreased ? '↑' : '↓'}${statistics!.compareLastMonthIncome}'),
 
-                  _buildStatistic('今日已接单', "99", '比昨日↑ 99'),
-                  _buildStatistic('预计今日收入', "99", '比昨日↑ 99'),
-                  _buildStatistic('本月总收入', "99", '比昨日↑ 99'),
+                  // _buildStatistic('今日已接单', "99", '比昨日↑ 99'),
+                  // _buildStatistic('预计今日收入', "99", '比昨日↑ 99'),
+                  // _buildStatistic('本月总收入', "99", '比昨日↑ 99'),
                 ],
               ),
               Container(
@@ -162,7 +204,7 @@ class _HomePageState extends State<HomePage> {
                       padding: const EdgeInsets.all(8.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: systemNotifications.map((e) => Text(e)).toList(),
+                        children: systemNotifications!.map((e) => Text(e)).toList(),
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -171,9 +213,9 @@ class _HomePageState extends State<HomePage> {
                     ListView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      itemCount: deliveryingOrders.length,
+                      itemCount: deliveryingOrders!.length,
                       itemBuilder: (context, index) {
-                        final order = deliveryingOrders[index];
+                        final order = deliveryingOrders![index];
 
                         return DeliveryOrderCard(order: order);
                       },

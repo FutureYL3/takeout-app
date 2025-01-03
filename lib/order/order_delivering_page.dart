@@ -197,7 +197,7 @@ class _OrderDeliveringPageState extends State<OrderDeliveringPage> with Automati
                     foodItems: order.foodItems,
                     onFrontButtonPressed: () {
                       // 更新订单状态为 completed
-                      orderController.updateOrderStatus(orderController.deliveryingOrders, order.orderId, 4, context, '送达成功', '');
+                      orderController.updateOrderStatus(orderController.deliveryingOrders, order.orderId, 6, context, '送达成功', '');
                     },
                     onRearButtonPressed: () => _showContactOptions(context, '+86', order.customerPhone),
                     customerPhone: order.customerPhone,

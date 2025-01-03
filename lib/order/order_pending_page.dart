@@ -29,7 +29,7 @@ class _OrderPendingPageState extends State<OrderPendingPage> with AutomaticKeepA
     super.initState();
     Future.microtask(() async {
       init(); // 保证在页面构建后初始化数据
-  });
+    });
   }
 
   void init() async {
@@ -159,14 +159,14 @@ class _OrderPendingPageState extends State<OrderPendingPage> with AutomaticKeepA
                     foodItems: order.foodItems,
                     onFrontButtonPressed: () {
                       // 更新订单状态为 accepted
-                      orderController.updateOrderStatus(orderController.pendingOrders, order.orderId, 2, context, '接单成功', '');
+                      orderController.updateOrderStatus(orderController.pendingOrders, order.orderId, 5, context, '接单成功', '');
                     },
                     onRearButtonPressed: () {
                       // 更新订单状态为 cancelled
                       orderController.updateOrderStatus(orderController.pendingOrders, order.orderId, 5, context, '取消成功', '');
                     },
                     customerPhone: order.customerPhone,
-                    status: 1,
+                    status: 4,
                   );
                 },
               );

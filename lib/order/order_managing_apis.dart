@@ -69,14 +69,25 @@ class OrderManagingApiService {
       // 时间日期格式化为yyyy-MM-dd
       String startDate = DateFormat('yyyy-MM-dd').format(start);
       String endDate = DateFormat('yyyy-MM-dd').format(end);
-
-      Response response = await dio.get('/orders/courier/viewOrder', queryParameters: {
-        // 'phoneNumber': phone,
-        'start': startDate,
-        'end': endDate,
-        'status': status,
-        'like': like,
-      });
+      Response response;
+      
+      if (like == null || like.isEmpty) {
+        response = await dio.get('/orders/courier/viewOrder', queryParameters: {
+          // 'phoneNumber': phone,
+          'start': startDate,
+          'end': endDate,
+          'status': status,
+        });
+      } else {
+        response = await dio.get('/orders/courier/viewOrder', queryParameters: {
+          // 'phoneNumber': phone,
+          'start': startDate,
+          'end': endDate,
+          'status': status,
+          'like': like,
+        });
+      }
+      
 
       return response.data;
     } on DioException catch (e) {

@@ -40,7 +40,7 @@ class OrderController extends GetxController {
     Future<void> fetchData() async {
       // 实现API调用，获取订单数据并赋值给pendingOrders
       String? phone = await secureStorage.read(key: 'phone');
-      int status = 1;
+      int status = 4;
       final SharedPreferences prefs = await SharedPreferences.getInstance();
 
       if (phone == null) {
@@ -71,10 +71,11 @@ class OrderController extends GetxController {
       if (result['code'] == 1) {
         pendingOrders.clear();
         for (var order in result['data']) {
+          print(order);
           pendingOrders.add(Order(
             orderId: order['id'],
             number: order['number'],
-            deliveryTime: order['deliveryTime'],
+            deliveryTime: order['deliveryTime'] ?? '',
             customerName: order['name'],
             customerPhone: order['cphone'],
             customerAddress: order['caddress'],
@@ -143,7 +144,7 @@ class OrderController extends GetxController {
           acceptedOrders.add(Order(
             orderId: order['id'],
             number: order['number'],
-            deliveryTime: order['deliveryTime'],
+            deliveryTime: order['deliveryTime'] ?? '',
             customerName: order['name'],
             customerPhone: order['cphone'],
             customerAddress: order['caddress'],
@@ -176,7 +177,7 @@ class OrderController extends GetxController {
     Future<void> fetchData() async {
       // 实现API调用，获取订单数据并赋值给deliveryingOrders
       String? phone = await secureStorage.read(key: 'phone');
-      int status = 3;
+      int status = 5;
       final SharedPreferences prefs = await SharedPreferences.getInstance();
 
       if (phone == null) {
@@ -210,7 +211,7 @@ class OrderController extends GetxController {
           deliveryingOrders.add(Order(
             orderId: order['id'],
             number: order['number'],
-            deliveryTime: order['deliveryTime'],
+            deliveryTime: order['deliveryTime'] ?? '',
             customerName: order['name'],
             customerPhone: order['cphone'],
             customerAddress: order['caddress'],
@@ -246,7 +247,7 @@ class OrderController extends GetxController {
     Future<void> fetchData() async {
       // 实现API调用，获取订单数据并赋值给deliveryingOrders
       String? phone = await secureStorage.read(key: 'phone');
-      int status = 4;
+      int status = 6;
       final SharedPreferences prefs = await SharedPreferences.getInstance();
 
       if (phone == null) {
@@ -280,7 +281,7 @@ class OrderController extends GetxController {
           completedOrders.add(Order(
             orderId: order['id'],
             number: order['number'],
-            deliveryTime: order['deliveryTime'],
+            deliveryTime: order['deliveryTime'] ?? '',
             customerName: order['name'],
             customerPhone: order['cphone'],
             customerAddress: order['caddress'],
@@ -346,7 +347,7 @@ class OrderController extends GetxController {
           cancelledOrders.add(Order(
             orderId: order['id'],
             number: order['number'],
-            deliveryTime: order['deliveryTime'],
+            deliveryTime: order['deliveryTime'] ?? '',
             customerName: order['name'],
             customerPhone: order['cphone'],
             customerAddress: order['caddress'],

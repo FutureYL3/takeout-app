@@ -34,4 +34,9 @@ class Statistics {
       isMonthIncomeIncreased: response['isMonthIncomeIncreased'],
     );
   }
+
+  @override
+  String toString() {
+    return 'Statistics{acceptedOrdersToday: $acceptedOrdersToday, compareYesterdayOrderNum: $compareYesterdayOrderNum, isOrderIncreased: $isOrderIncreased, estimatedIncomeToday: $estimatedIncomeToday, compareYesterdayIncome: $compareYesterdayIncome, isIncomeIncreased: $isIncomeIncreased, totalIncomeThisMonth: $totalIncomeThisMonth, compareLastMonthIncome: $compareLastMonthIncome, isMonthIncomeIncreased: $isMonthIncomeIncreased}';
+  }
 }

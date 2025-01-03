@@ -97,7 +97,8 @@ class PersonalInfoApiService {
       return response.data;
     } on DioException catch (e) {
       // 处理 Dio 的错误
-      showSnackBar('获取配送区域信息失败', e.message!, ContentType.failure, ctx);
+      print(e.message);
+      showSnackBar('获取配送区域失败', e.message!, ContentType.failure, ctx);
       return {};
     }
   }
