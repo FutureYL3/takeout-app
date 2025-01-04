@@ -145,11 +145,11 @@ class _AreaManagementPageState extends State<AreaManagementPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 10,),
-          Text('所属区域：${schoolName ?? 'xxx大学'}',
+          Text('所属大学：${schoolName ?? ''}',
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)
           ),
           const SizedBox(height: 10),
-          Text('配送范围：${deliveryArea ?? ''}',
+          Text('配送区域：${deliveryArea ?? ''}',
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)
           ),
           const SizedBox(height: 20),

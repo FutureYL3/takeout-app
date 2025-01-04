@@ -12,6 +12,7 @@ import '../welcome/welcome_page.dart';
 class CommonUtilsApiService {
   static const String baseUrl = 'http://114.55.108.97:8080';
   late Dio _dio;
+  final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
 
   CommonUtilsApiService() {
     BaseOptions options = BaseOptions(
@@ -41,6 +42,15 @@ class CommonUtilsApiService {
       //   print('Error: ${e.response?.statusCode} ${e.message}');
       //   return handler.next(e); // Continue the error
       // },
+      onRequest: (options, handler) async {
+        // 在请求发送之前检查和添加tokenstatus
+        String? accessToken = await secureStorage.read(key: 'accessToken') ?? '';
+        String? refreshToken = await secureStorage.read(key: 'refreshToken') ?? '';
+
+        options.headers['token'] = accessToken;
+        options.headers['refreshToken'] = refreshToken;
+        return handler.next(options); 
+      },
       onResponse: (response, handler) {
         // 如果响应是字符串，尝试手动解析
         if (response.data is String) {
@@ -99,12 +109,13 @@ class CommonUtilsApiService {
   Future<Map<String, dynamic>> refreshAccessToken(BuildContext ctx) async {
     // print('尝试刷新token');
     try {
-      Response response = await _dio.post('/common/newToken/login/');
+      Response response = await _dio.get('/common/newToken/login');
       // print('成功刷新token');
       return response.data;
     } on DioException catch (e) {
       // 处理 Dio 的错误
       showSnackBar('刷新令牌失败', e.message!, ContentType.failure, ctx);
+      print('刷新令牌失败：${e.message}');
       return {};
     }
   }

@@ -81,7 +81,11 @@ class MsgNotificationApiService {
     // 时间日期格式化为yyyy-MM-dd
     String begin = DateFormat('yyyy-MM-dd').format(start);
     String end = DateFormat('yyyy-MM-dd').format(now);
-    
+
+    // print(begin);
+    // print(end);
+    // print(like);
+
     try {
       Response response = await dio.post('/courier/notice/getNotice', data: {
         'beginDate': begin,

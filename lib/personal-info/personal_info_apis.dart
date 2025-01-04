@@ -94,6 +94,7 @@ class PersonalInfoApiService {
         'phone': phone,
       });
       // print(response);
+      print(response.data);
       return response.data;
     } on DioException catch (e) {
       // 处理 Dio 的错误

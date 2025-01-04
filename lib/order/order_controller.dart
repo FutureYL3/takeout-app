@@ -444,4 +444,52 @@ class OrderController extends GetxController {
       showSnackBar(successTitle, successDesc, ContentType.success, ctx);
     }
   }
+
+  Future<void> rejectPendingOrder(RxList<Order> originList, int orderId, BuildContext ctx, String successTitle, String successDesc) async {
+    // 找到对应的订单
+    int index = originList.indexWhere((order) => order.orderId == orderId);
+
+    if (index == -1) {
+      showSnackBar('未知错误', '请稍候重试', ContentType.failure, ctx);
+      return;
+    }
+
+    String? phone = await secureStorage.read(key: 'phone');
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    if (phone == null) {
+      // 如果没有存储手机号，即表示未登录，跳转到欢迎页面
+      await Get.offAll(() => const WelcomePage());
+      return;
+    }
+
+    Map<String, dynamic> result = await apiService.rejectPendingOrder(orderId, ctx);
+
+    if (result['code'] == 401) {
+      Map<String, dynamic> refreshData = await commonUtilsApiService.refreshAccessToken(ctx);
+      if (refreshData['code'] == 409) {
+        // 如果refreshToken也过期了，要求重新登录
+        await secureStorage.deleteAll();
+        await prefs.setBool('Login_Status', false);
+        Get.offAll(() => const WelcomePage());
+        return;
+      }
+      if (refreshData['code'] == 1) {
+        secureStorage.write(key: 'accessToken', value: refreshData['data']['accessToken']);
+        secureStorage.write(key: 'refreshToken', value: refreshData['data']['refreshToken']);
+      }
+      rejectPendingOrder(originList, orderId, ctx, successTitle, successDesc); // 重新尝试更新
+      return;
+    }
+
+
+    if (result['code'] == 1) {
+      // 更新本地状态
+      originList.removeAt(index);
+      originList.refresh(); // 通知监听者
+      showSnackBar(successTitle, successDesc, ContentType.success, ctx);
+    }
+
+    
+  }
 }

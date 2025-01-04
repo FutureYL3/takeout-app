@@ -163,7 +163,7 @@ class _OrderPendingPageState extends State<OrderPendingPage> with AutomaticKeepA
                     },
                     onRearButtonPressed: () {
                       // 更新订单状态为 cancelled
-                      orderController.updateOrderStatus(orderController.pendingOrders, order.orderId, 5, context, '取消成功', '');
+                      orderController.rejectPendingOrder(orderController.pendingOrders, order.orderId, context, '取消成功', '');
                     },
                     customerPhone: order.customerPhone,
                     status: 4,

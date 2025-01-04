@@ -21,6 +21,7 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _idCardController = TextEditingController();
   final GlobalKey _formKey = GlobalKey<FormState>();
   final SignUpApiService signUpApiService = SignUpApiService();
 
@@ -215,6 +216,31 @@ class _SignUpPageState extends State<SignUpPage> {
                         },
                       ),
                       const SizedBox(height: 20),
+                      TextFormField(
+                        style: const TextStyle(fontSize: 14),
+                        decoration: InputDecoration(
+                          labelText: '身份证号',
+                          hintText: "请输入身份证号",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(color: Colors.grey),
+                          ),
+                          // filled: true,
+                        ),
+                        // keyboardType: TextInputType.number,
+                        controller: _idCardController,
+                        validator: (value) {
+                          RegExp regTel = RegExp(r'^\d{6}(18|19|20)?\d{2}(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])\d{3}(\d|[Xx])$');
+                          if (value!.isEmpty) {
+                            return '请输入身份证';
+                          }
+                          if (!regTel.hasMatch(value)) {
+                            return '请输入正确的身份证';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 20,),
                       _isCollegeLoading
                           ? const CircularProgressIndicator()
                           : DropdownButtonFormField<String>(
@@ -296,9 +322,10 @@ class _SignUpPageState extends State<SignUpPage> {
                             final String validationCode = _codeController.text;
                             final String realName = _nameController.text;
                             final String password = _passwordController.text;
+                            final String idCardNumber = _idCardController.text;
                             
                             // 发送请求
-                            Map<String, dynamic> response = await signUpApiService.submit(phoneNumber, realName, validationCode, password, _selectedCollegeId.toString(), context);
+                            Map<String, dynamic> response = await signUpApiService.submit(phoneNumber, realName, validationCode, password, _selectedCollegeId.toString(), idCardNumber, context);
 
                             if (response['code'] == 1) {
                               // 注册成功

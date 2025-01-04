@@ -201,7 +201,7 @@ class _OrderDeliveringPageState extends State<OrderDeliveringPage> with Automati
                     },
                     onRearButtonPressed: () => _showContactOptions(context, '+86', order.customerPhone),
                     customerPhone: order.customerPhone,
-                    status: 3,
+                    status: 5,
                   );
                 },
               );

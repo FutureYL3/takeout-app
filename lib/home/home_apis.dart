@@ -90,19 +90,22 @@ class HomeApiService {
 
   Future<Map<String, dynamic>> getSystemNotification(BuildContext ctx) async {
     DateTime now = DateTime.now();
-    DateTime start = now;
-    start = DateTime(now.year, now.month, now.day);
+    DateTime start = DateTime(now.year, now.month, now.day);
     
     // 时间日期格式化为yyyy-MM-dd
     String begin = DateFormat('yyyy-MM-dd').format(start);
     String end = DateFormat('yyyy-MM-dd').format(now);
+
+    // print(begin);
+    // print(end);
     
     try {
       Response response = await dio.post('/courier/notice/getNotice', data: {
         'beginDate': begin,
         'endDate': end,
+        'content': ''
       });
-
+      print(response.data);
       return response.data;
     } on DioException catch (e) {
       // 处理 Dio 的错误

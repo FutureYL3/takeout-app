@@ -92,7 +92,7 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
         return;
       } else {
         // 登录失败
-        showSnackBar('登录失败', response['msg'] ?? '', ContentType.failure, context);
+        showSnackBar('登录失败', response['msg'] ?? '请稍后再试或联系客服', ContentType.failure, context);
       }
     }
   }

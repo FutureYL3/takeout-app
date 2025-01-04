@@ -20,14 +20,15 @@ class SignUpApiService {
     _dio = Dio(options);
 
   }  
-  Future<Map<String, dynamic>> submit(String phoneNumber, String realName, String validationCode, String password, String collegeId, BuildContext ctx) async {
+  Future<Map<String, dynamic>> submit(String phoneNumber, String realName, String validationCode, String password, String collegeId, String idCardNumber, BuildContext ctx) async {
     try {
       Response response = await _dio.post('/courier/register', data: {
         'phoneNumber': phoneNumber,
         'realName': realName,
         'validationCode': validationCode,
         'password': password,
-        'collegeId': collegeId
+        'collegeId': collegeId,
+        'idCardNumber': idCardNumber
       });
 
       return response.data;

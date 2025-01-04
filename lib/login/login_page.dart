@@ -45,7 +45,7 @@ class _LoginPageState extends State<LoginPage> {
         return;
       } else {
         // 登录失败
-        showSnackBar('登录失败', response['msg'] ?? '请检查用户名或密码', ContentType.failure, context);
+        showSnackBar('登录失败', response['msg'] ?? '请稍后再试或联系客服', ContentType.failure, context);
       }
     }
   }

@@ -81,7 +81,7 @@ class _HomePageState extends State<HomePage> {
     if (response['code'] == 1) {
       List<dynamic> data = response['data'];
       List<SysNotification> notifications = data.map((e) => SysNotification(title: e['title'], content: e['content'], releaseTime: e['releaseTime'])).toList();
-
+      print(notifications);
       setState(() {
         sysNotification = notifications;
       });

@@ -134,12 +134,25 @@ class OrderManagingApiService {
   Future<Map<String, dynamic>> refreshAccessToken(BuildContext ctx) async {
     // print('尝试刷新token');
     try {
-      Response response = await dio.post('/common/newToken/login/');
+      Response response = await dio.get('/common/newToken/login');
       // print('成功刷新token');
       return response.data;
     } on DioException catch (e) {
       // 处理 Dio 的错误
       showSnackBar('刷新令牌失败', e.message!, ContentType.failure, ctx);
+      return {};
+    }
+  }
+
+  Future<Map<String, dynamic>> rejectPendingOrder(int orderId, BuildContext ctx) async {
+    try {
+      Response response = await dio.post('/orders/Refuse_to_accept_the_order', queryParameters: {
+        'orderId': orderId,
+      });
+      return response.data;
+    } on DioException catch (e) {
+      // 处理 Dio 的错误
+      showSnackBar('取消配送该订单失败', e.message!, ContentType.failure, ctx);
       return {};
     }
   }
