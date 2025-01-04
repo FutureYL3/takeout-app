@@ -3,6 +3,11 @@ import 'dart:convert';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:get/get.dart' hide Response;
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../welcome/welcome_page.dart';
 
 class CommonUtilsApiService {
   static const String baseUrl = 'http://114.55.108.97:8080';
@@ -90,6 +95,20 @@ class CommonUtilsApiService {
       };
     }
   }
+
+  Future<Map<String, dynamic>> refreshAccessToken(BuildContext ctx) async {
+    // print('尝试刷新token');
+    try {
+      Response response = await _dio.post('/common/newToken/login/');
+      // print('成功刷新token');
+      return response.data;
+    } on DioException catch (e) {
+      // 处理 Dio 的错误
+      showSnackBar('刷新令牌失败', e.message!, ContentType.failure, ctx);
+      return {};
+    }
+  }
+
 }
 
 void showSnackBar(String title, String msg, ContentType type, BuildContext ctx) {
@@ -107,4 +126,26 @@ void showSnackBar(String title, String msg, ContentType type, BuildContext ctx) 
   ScaffoldMessenger.of(ctx)
     ..hideCurrentSnackBar()
     ..showSnackBar(snackBar);
+}
+
+void checkForTokenRefresh(Map<String, dynamic> response, BuildContext ctx, Function f) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  final CommonUtilsApiService commonUtilsApiService = CommonUtilsApiService();
+  const FlutterSecureStorage secureStorage = FlutterSecureStorage();
+  if (response['code'] == 401) {
+    Map<String, dynamic> refreshData = await commonUtilsApiService.refreshAccessToken(ctx);
+    if (refreshData['code'] == 409) {
+      // 如果refreshToken也过期了，要求重新登录
+      await secureStorage.deleteAll();
+      await prefs.setBool('Login_Status', false);
+      Get.offAll(() => const WelcomePage());
+      return;
+    }
+    if (refreshData['code'] == 1) {
+      secureStorage.write(key: 'accessToken', value: refreshData['data']['accessToken']);
+      secureStorage.write(key: 'refreshToken', value: refreshData['data']['refreshToken']);
+    }
+    f(); // 重新执行原来的请求
+    return;
+  }
 }

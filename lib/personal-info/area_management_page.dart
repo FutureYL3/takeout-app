@@ -124,6 +124,9 @@ class _AreaManagementPageState extends State<AreaManagementPage> {
   // 更新配送区域
   Future<void> _updateDeliveryArea(String newArea) async {
     final Map<String, dynamic> response = await personalInfoApiService.updateDeliveryArea(phone!, newArea, context);
+    
+    checkForTokenRefresh(response, context, () => _updateDeliveryArea(newArea));
+    
     if (response['code'] == 1) {
       setState(() {
         deliveryArea = newArea; // 更新页面的配送区域

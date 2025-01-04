@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kssdt/home/deliverying_order_card.dart';
 import 'package:kssdt/home/statistics_model.dart';
+import 'package:kssdt/utils/common_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../message-notification/msg_notification_page.dart';
+import '../message-notification/sys_notification_model.dart';
 import '../order/order_managing_page.dart';
 import '../personal-info/personal_center_page.dart';
 import 'Deliverying_order_model.dart';
@@ -22,13 +24,15 @@ class _HomePageState extends State<HomePage> {
   bool isOnline = false;
   // List<DeliveryingOrder>? deliveryingOrders = [DeliveryingOrder(customerName: '孙先生', deliveryAddr: '学子餐厅', mapUrl: 'https://bbs-pic.datacourse.cn/forum/202205/15/122133oxzlhoolhcsxp6so.jpg')]; 
   List<DeliveryingOrder>? deliveryingOrders; 
-  List<String>? systemNotifications = [];
+  List<SysNotification>? sysNotification;
   Statistics? statistics;
   final HomeApiService homeApiService = HomeApiService();
 
   void changeOnlineStatus(bool status) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     Map<String, dynamic> response = await homeApiService.updateMyOnlineStatus(status, context);
+
+    checkForTokenRefresh(response, context, () => changeOnlineStatus(status));
 
     if (response['code'] == 1) {
       setState(() {
@@ -41,6 +45,8 @@ class _HomePageState extends State<HomePage> {
   void getStatistics() async {
     DateTime now = DateTime.now();
     Map<String, dynamic> response = await homeApiService.getStatisticsInfo(now, context);
+
+    checkForTokenRefresh(response, context, getStatistics);
 
     if (response['code'] == 1) {
       // print(response['data']);
@@ -55,6 +61,8 @@ class _HomePageState extends State<HomePage> {
     DateTime now = DateTime.now();
     Map<String, dynamic> response = await homeApiService.getDeliveryingOrders(now, context);
 
+    checkForTokenRefresh(response, context, getDeliveryingOrders);
+
     if (response['code'] == 1) {
       List<dynamic> data = response['data'];
       List<DeliveryingOrder> orders = data.map((e) => DeliveryingOrder(customerName: e['name'], deliveryAddr: e['caddress'], mapUrl: /*e['mapUrl']*/"")).toList();
@@ -68,11 +76,14 @@ class _HomePageState extends State<HomePage> {
   void getSystemNotification() async {
     Map<String, dynamic> response = await homeApiService.getSystemNotification(context);
 
+    checkForTokenRefresh(response, context, getSystemNotification);
+
     if (response['code'] == 1) {
       List<dynamic> data = response['data'];
-      List<String> notifications = data.map((e) => e.toString()).toList();
+      List<SysNotification> notifications = data.map((e) => SysNotification(title: e['title'], content: e['content'], releaseTime: e['releaseTime'])).toList();
+
       setState(() {
-        systemNotifications = notifications;
+        sysNotification = notifications;
       });
     }
   }
@@ -94,7 +105,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     getStatistics();
     getDeliveryingOrders();
-    // getSystemNotification();
+    getSystemNotification();
     getOnlineStatus();
     super.initState();
   }
@@ -103,7 +114,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     // 确保数据加载完成才显示页面
-    if (statistics == null || deliveryingOrders == null || systemNotifications == null) {
+    if (statistics == null || deliveryingOrders == null || sysNotification == null) {
       return Scaffold(
         appBar: AppBar(
           title: Row(
@@ -204,7 +215,7 @@ class _HomePageState extends State<HomePage> {
                       padding: const EdgeInsets.all(8.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: systemNotifications!.map((e) => Text(e)).toList(),
+                        children: sysNotification!.map((e) => Text(e.content)).toList().isNotEmpty ? sysNotification!.map((e) => Text(e.content)).toList() : [const Text('暂无通知')],
                       ),
                     ),
                     const SizedBox(height: 20),

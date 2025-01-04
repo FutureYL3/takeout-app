@@ -19,6 +19,7 @@ import 'order_managing_apis.dart';
 class OrderController extends GetxController {
   final OrderManagingApiService apiService = OrderManagingApiService();
   final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+  final CommonUtilsApiService commonUtilsApiService = CommonUtilsApiService();
 
   // 集中管理所有状态的订单
   var pendingOrders = <Order>[].obs;
@@ -52,7 +53,7 @@ class OrderController extends GetxController {
       Map<String, dynamic> result = await apiService.getOrders(phone, start, end, status, like, ctx);
 
       if (result['code'] == 401) {
-        Map<String, dynamic> refreshData = await apiService.refreshAccessToken(ctx);
+        Map<String, dynamic> refreshData = await commonUtilsApiService.refreshAccessToken(ctx);
         if (refreshData['code'] == 409) {
           // 如果refreshToken也过期了，要求重新登录
           await secureStorage.deleteAll();
@@ -122,7 +123,7 @@ class OrderController extends GetxController {
       Map<String, dynamic> result = await apiService.getOrders(phone, start, end, status, like, ctx);
 
       if (result['code'] == 401) {
-        Map<String, dynamic> refreshData = await apiService.refreshAccessToken(ctx);
+        Map<String, dynamic> refreshData = await commonUtilsApiService.refreshAccessToken(ctx);
         if (refreshData['code'] == 409) {
           // 如果refreshToken也过期了，要求重新登录
           await secureStorage.deleteAll();
@@ -189,7 +190,7 @@ class OrderController extends GetxController {
       Map<String, dynamic> result = await apiService.getOrders(phone, start, end, status, like, ctx);
 
       if (result['code'] == 401) {
-        Map<String, dynamic> refreshData = await apiService.refreshAccessToken(ctx);
+        Map<String, dynamic> refreshData = await commonUtilsApiService.refreshAccessToken(ctx);
         if (refreshData['code'] == 409) {
           // 如果refreshToken也过期了，要求重新登录
           await secureStorage.deleteAll();
@@ -259,7 +260,7 @@ class OrderController extends GetxController {
       Map<String, dynamic> result = await apiService.getOrders(phone, start, end, status, like, ctx);
 
       if (result['code'] == 401) {
-        Map<String, dynamic> refreshData = await apiService.refreshAccessToken(ctx);
+        Map<String, dynamic> refreshData = await commonUtilsApiService.refreshAccessToken(ctx);
         if (refreshData['code'] == 409) {
           // 如果refreshToken也过期了，要求重新登录
           await secureStorage.deleteAll();
@@ -325,7 +326,7 @@ class OrderController extends GetxController {
       Map<String, dynamic> result = await apiService.getOrders(phone, start, end, status, like, ctx);
 
       if (result['code'] == 401) {
-        Map<String, dynamic> refreshData = await apiService.refreshAccessToken(ctx);
+        Map<String, dynamic> refreshData = await commonUtilsApiService.refreshAccessToken(ctx);
         if (refreshData['code'] == 409) {
           // 如果refreshToken也过期了，要求重新登录
           await secureStorage.deleteAll();
@@ -396,7 +397,7 @@ class OrderController extends GetxController {
     Map<String, dynamic> result = await apiService.updateOrders(phone, orderId, newStatus, ctx);
 
     if (result['code'] == 401) {
-      Map<String, dynamic> refreshData = await apiService.refreshAccessToken(ctx);
+      Map<String, dynamic> refreshData = await commonUtilsApiService.refreshAccessToken(ctx);
       if (refreshData['code'] == 409) {
         // 如果refreshToken也过期了，要求重新登录
         await secureStorage.deleteAll();

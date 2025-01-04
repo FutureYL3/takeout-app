@@ -89,8 +89,19 @@ class HomeApiService {
   }
 
   Future<Map<String, dynamic>> getSystemNotification(BuildContext ctx) async {
+    DateTime now = DateTime.now();
+    DateTime start = now;
+    start = DateTime(now.year, now.month, now.day);
+    
+    // 时间日期格式化为yyyy-MM-dd
+    String begin = DateFormat('yyyy-MM-dd').format(start);
+    String end = DateFormat('yyyy-MM-dd').format(now);
+    
     try {
-      Response response = await dio.get('/courier/systemNotifications');
+      Response response = await dio.post('/courier/notice/getNotice', data: {
+        'beginDate': begin,
+        'endDate': end,
+      });
 
       return response.data;
     } on DioException catch (e) {
@@ -111,6 +122,7 @@ class HomeApiService {
     } on DioException catch (e) {
       // 处理 Dio 的错误
       showSnackBar('获取正在配送订单信息失败', e.message!, ContentType.failure, ctx);
+      print(e.message);
       return {};
     }
   }

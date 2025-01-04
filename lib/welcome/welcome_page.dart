@@ -76,7 +76,7 @@ class WelcomePage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Text(
-                  '查看审核进度',
+                  '审核进度查询',
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.white),
                 ),

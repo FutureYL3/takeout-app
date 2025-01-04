@@ -198,11 +198,13 @@ class MsgNotificationApiService {
         Map<String, dynamic> result = response.data;
         // print(result);
 
+        checkForTokenRefresh(result, ctx, () => uploadImage(imagesList, ctx));
+
         if (result['code'] == 1) {
           // 上传成功
           // print(result);
           imagesList.add(result['data']);
-          showSnackBar('上传成功', '成功上传了头像', ContentType.success, ctx);
+          showSnackBar('上传成功', '成功上传了图片', ContentType.success, ctx);
         } else {
           // 上传失败
           showSnackBar('上传失败', result['msg'], ContentType.failure, ctx);

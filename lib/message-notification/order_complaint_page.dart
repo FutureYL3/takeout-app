@@ -21,6 +21,8 @@ class _NotificationsPageState extends State<ComplaintsPage> {
   void getOrderComplaints() async {
     Map<String, dynamic> response = await msgNotificationApiService.getUserComplaints(_selectedDate, _searchController.text, context);
 
+    checkForTokenRefresh(response, context, getOrderComplaints);
+
     if (response['code'] == 1) {
       List<dynamic> data = response['data'];
       List<OrderComplaint> complaints = data.map((e) => OrderComplaint(id: e['id'], appealType: e['appealType'], complaintsContent: e['complaintsContent']
@@ -164,14 +166,27 @@ class _NotificationsPageState extends State<ComplaintsPage> {
           actions: [
             TextButton(
               onPressed: () async {
-                Map<String, dynamic> response = await msgNotificationApiService.acceptComplaint(c.id, context);
+                // 封装需要重复执行的逻辑为一个闭包
+                f() async {
+                  Map<String, dynamic> response = await msgNotificationApiService.acceptComplaint(c.id, context);
 
-                if (response['code'] == 1) {
-                  showSnackBar("接受成功", "您已接收用户${c.customer}的投诉", ContentType.success, context);
+                  // 检查 token 是否需要刷新
+                  checkForTokenRefresh(response, context, f);
+
+                  // 根据响应结果处理逻辑
+                  if (response['code'] == 1) {
+                    showSnackBar("接受成功", "您已接收用户${c.customer}的投诉", ContentType.success, context);
+                  }
+
+                  // 获取最新的投诉订单
+                  getOrderComplaints();
+
+                  // 关闭当前页面
+                  Navigator.of(context).pop();
                 }
-                
-                getOrderComplaints();
-                Navigator.of(context).pop();
+
+                // 首次调用逻辑
+                await f();
               },
               child: Container(
                 color: Colors.green,
@@ -276,14 +291,32 @@ class _NotificationsPageState extends State<ComplaintsPage> {
           actions: [
             ElevatedButton(
               onPressed: () async {
-                Map<String, dynamic> response = await msgNotificationApiService.submitAppeal(c.id, appealController.text, imageList, context);
-                if (response['code'] == 1) {
-                  showSnackBar("申诉提交成功", "您已提交对用户${c.customer}投诉的申诉", ContentType.success, context);
+                // 将提交申诉逻辑封装为闭包
+                f() async {
+                  Map<String, dynamic> response = await msgNotificationApiService.submitAppeal(
+                    c.id,
+                    appealController.text,
+                    imageList,
+                    context,
+                  );
+
+                  // 检查 token 是否过期
+                  checkForTokenRefresh(response, context, f);
+
+                  // 根据响应结果处理逻辑
+                  if (response['code'] == 1) {
+                    showSnackBar("申诉提交成功", "您已提交对用户${c.customer}投诉的申诉", ContentType.success, context);
+                  }
+
+                  // 更新订单投诉
+                  getOrderComplaints();
+
+                  // 关闭当前页面
+                  Navigator.of(context).pop();
                 }
-                
-                getOrderComplaints();
-                Navigator.of(context).pop();
-                // 提交申诉逻辑
+
+                // 首次调用申诉逻辑
+                await f();
               },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
               child: const Text('提交', style: TextStyle(color: Colors.white)),

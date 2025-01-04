@@ -20,14 +20,27 @@ class SignUpApiService {
     _dio = Dio(options);
 
   }  
-  Future<Map<String, dynamic>> submit(String phoneNumber, String realName, String validationCode, String password, BuildContext ctx) async {
+  Future<Map<String, dynamic>> submit(String phoneNumber, String realName, String validationCode, String password, String collegeId, BuildContext ctx) async {
     try {
       Response response = await _dio.post('/courier/register', data: {
         'phoneNumber': phoneNumber,
         'realName': realName,
         'validationCode': validationCode,
-        'password': password
+        'password': password,
+        'collegeId': collegeId
       });
+
+      return response.data;
+    } on DioException catch (e) {
+      // 处理 Dio 的错误
+      showSnackBar('提交失败', e.message!, ContentType.failure, ctx);
+      return {};
+    }
+  }
+
+  Future<Map<String, dynamic>> getCollegeList(BuildContext ctx) async {
+    try {
+      Response response = await _dio.get('/common/getUniversityList');
 
       return response.data;
     } on DioException catch (e) {

@@ -118,93 +118,97 @@ class AuthStatusPageState extends State<AuthStatusPage> {
         child: SizedBox(
           width: MediaQuery.of(context).size.width * 0.7,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              TextFormField(
-                decoration: const InputDecoration(
-                  labelText: '手机号',
-                  hintText: '请输入手机号',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(20))
-                  ),
-                ),
-                controller: _phoneController,
-                keyboardType: TextInputType.phone,
-                validator: (value) {
-                  RegExp regTel = RegExp(r'^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$');
-                  if (value!.isEmpty) {
-                    return '请输入手机号';
-                  }
-                  if (!regTel.hasMatch(value)) {
-                    return '请输入正确的手机号';
-                  }
-                  return null;
-                },
-              ),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.3),
+              const Text('审核状态查询', style: TextStyle(fontSize: 24)),
               const SizedBox(height: 20),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.35,
-                    child: TextFormField(
-                      style: const TextStyle(fontSize: 14),
-                      decoration: const InputDecoration(
-                        labelText: '验证码',
-                        hintText: "请输入验证码",
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(20))
-                        )
-                      ),
-                      keyboardType: TextInputType.number,
-                      controller: _codeController,
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return '请输入验证码';
-                        }
-                        return null;
-                      },
-                    ),
-                  ),
-                  SizedBox(width: MediaQuery.of(context).size.width * 0.025),
-                  ElevatedButton(
-                    onPressed: _canResend ? _startCountdown : null,
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(60, 50),
-                      maximumSize: const Size(120, 50),
-                      textStyle: const TextStyle(fontSize: 14),
-                    ),
-                    child: Text(_canResend ? '获取验证码' : '(${_countdown}s)'),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 30),
-              GestureDetector(
-                onTap: () {
-                  query(_phoneController.text, _codeController.text, context);
-                },
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.6,
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.green,
-                    borderRadius: BorderRadius.circular(10)
-                  ),
-                  child: const Text(
-                    '查询审核状态',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(
-                height: 100,
-              )
+              const Text('请致电客服电话：400-123-4567', style: TextStyle(fontSize: 16)),
+              // TextFormField(
+              //   decoration: const InputDecoration(
+              //     labelText: '手机号',
+              //     hintText: '请输入手机号',
+              //     border: OutlineInputBorder(
+              //       borderRadius: BorderRadius.all(Radius.circular(20))
+              //     ),
+              //   ),
+              //   controller: _phoneController,
+              //   keyboardType: TextInputType.phone,
+              //   validator: (value) {
+              //     RegExp regTel = RegExp(r'^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$');
+              //     if (value!.isEmpty) {
+              //       return '请输入手机号';
+              //     }
+              //     if (!regTel.hasMatch(value)) {
+              //       return '请输入正确的手机号';
+              //     }
+              //     return null;
+              //   },
+              // ),
+              // const SizedBox(height: 20),
+              // Row(
+              //   crossAxisAlignment: CrossAxisAlignment.center,
+              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //   children: [
+              //     SizedBox(
+              //       width: MediaQuery.of(context).size.width * 0.35,
+              //       child: TextFormField(
+              //         style: const TextStyle(fontSize: 14),
+              //         decoration: const InputDecoration(
+              //           labelText: '验证码',
+              //           hintText: "请输入验证码",
+              //           border: OutlineInputBorder(
+              //             borderRadius: BorderRadius.all(Radius.circular(20))
+              //           )
+              //         ),
+              //         keyboardType: TextInputType.number,
+              //         controller: _codeController,
+              //         validator: (value) {
+              //           if (value!.isEmpty) {
+              //             return '请输入验证码';
+              //           }
+              //           return null;
+              //         },
+              //       ),
+              //     ),
+              //     SizedBox(width: MediaQuery.of(context).size.width * 0.025),
+              //     ElevatedButton(
+              //       onPressed: _canResend ? _startCountdown : null,
+              //       style: ElevatedButton.styleFrom(
+              //         minimumSize: const Size(60, 50),
+              //         maximumSize: const Size(120, 50),
+              //         textStyle: const TextStyle(fontSize: 14),
+              //       ),
+              //       child: Text(_canResend ? '获取验证码' : '(${_countdown}s)'),
+              //     ),
+              //   ],
+              // ),
+              // const SizedBox(height: 30),
+              // GestureDetector(
+              //   onTap: () {
+              //     query(_phoneController.text, _codeController.text, context);
+              //   },
+              //   child: Container(
+              //     width: MediaQuery.of(context).size.width * 0.6,
+              //     padding: const EdgeInsets.all(10),
+              //     decoration: BoxDecoration(
+              //       color: Colors.green,
+              //       borderRadius: BorderRadius.circular(10)
+              //     ),
+              //     child: const Text(
+              //       '查询审核状态',
+              //       textAlign: TextAlign.center,
+              //       style: TextStyle(
+              //         color: Colors.white,
+              //         fontSize: 16
+              //       ),
+              //     ),
+              //   ),
+              // ),
+              // const SizedBox(
+              //   height: 100,
+              // )
             ],
           ),
         )

@@ -22,12 +22,50 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
   final GlobalKey _formKey = GlobalKey<FormState>();
+  final SignUpApiService signUpApiService = SignUpApiService();
 
   final CommonUtilsApiService utils = CommonUtilsApiService();
 
   int _countdown = 60;
   Timer? _timer;
   bool _canResend = true;
+
+  // 新增变量：大学列表和选中值
+  List<Map<String, dynamic>> _collegeList = [];
+  String? _selectedCollegeName;
+  int? _selectedCollegeId;
+  bool _isCollegeLoading = true;
+
+  @override
+  initState() {
+    super.initState();
+    _fetchCollegeList();
+  }
+
+  Future<void> _fetchCollegeList() async {
+    try {
+      Map<String, dynamic> response = await signUpApiService.getCollegeList(context);
+
+      // 解析大学列表
+      if (response['code'] == 1 && response['data'] != null && response['data']['UniversityList'] != null) {
+        setState(() {
+          _collegeList = List<Map<String, dynamic>>.from(response['data']['UniversityList']);
+          _isCollegeLoading = false;
+        });
+      } else {
+        setState(() {
+          _isCollegeLoading = false;
+        });
+        showSnackBar('错误', response['msg'] ?? '获取大学列表失败', ContentType.failure, context);
+      }
+    } catch (e) {
+      setState(() {
+        _isCollegeLoading = false;
+      });
+      showSnackBar('错误', '无法获取大学列表，请稍后再试', ContentType.failure, context);
+    }
+  }
+
 
   // 开始倒计时
   void _startCountdown() async {
@@ -176,6 +214,31 @@ class _SignUpPageState extends State<SignUpPage> {
                           return null;
                         },
                       ),
+                      const SizedBox(height: 20),
+                      _isCollegeLoading
+                          ? const CircularProgressIndicator()
+                          : DropdownButtonFormField<String>(
+                              decoration: InputDecoration(
+                                labelText: '选择大学',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              value: _selectedCollegeName,
+                              items: _collegeList
+                                  .map((college) => DropdownMenuItem<String>(
+                                        value: college['collegeName'],
+                                        child: Text(college['collegeName']),
+                                      ))
+                                  .toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  _selectedCollegeName = value;
+                                  _selectedCollegeId = _collegeList.firstWhere((college) => college['collegeName'] == value)['collegeId'];
+                                });
+                                // print(_selectedCollegeId);
+                              },
+                            ),
                       const SizedBox(height: 20,),
                       TextFormField(
                         style: const TextStyle(fontSize: 14),
@@ -233,9 +296,9 @@ class _SignUpPageState extends State<SignUpPage> {
                             final String validationCode = _codeController.text;
                             final String realName = _nameController.text;
                             final String password = _passwordController.text;
-                            final SignUpApiService signUpApiService = SignUpApiService();
+                            
                             // 发送请求
-                            Map<String, dynamic> response = await signUpApiService.submit(phoneNumber, realName, validationCode, password, context);
+                            Map<String, dynamic> response = await signUpApiService.submit(phoneNumber, realName, validationCode, password, _selectedCollegeId.toString(), context);
 
                             if (response['code'] == 1) {
                               // 注册成功

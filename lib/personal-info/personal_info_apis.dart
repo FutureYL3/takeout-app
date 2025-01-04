@@ -157,6 +157,8 @@ class PersonalInfoApiService {
         Map<String, dynamic> result = response.data;
         // print(result);
 
+        checkForTokenRefresh(result, ctx, () => uploadImage(dto, ctx));
+
         if (result['code'] == 1) {
           // 上传成功
           // print(result);

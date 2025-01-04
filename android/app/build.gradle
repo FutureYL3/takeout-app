@@ -54,9 +54,9 @@ android {
 
     signingConfigs {
         release {
-            keyAlias 'dushe'
+            keyAlias 'mykey'
             keyPassword 'dushe2024'
-            storeFile file('/home/yl/kssdt.jks')
+            storeFile file('D:\\takeout-app\\kssdt.jks')
             storePassword 'dushe2024'
         }
     }

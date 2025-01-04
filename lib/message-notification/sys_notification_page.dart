@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kssdt/utils/common_utils.dart';
 import './msg_notification_apis.dart';
 import 'sys_notification_model.dart';
 
@@ -17,6 +18,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
 
   void getSysNotification() async {
     Map<String, dynamic> response = await msgNotificationApiService.getSystemNotifications(_selectedDate, _searchController.text, context);
+
+    checkForTokenRefresh(response, context, getSysNotification);
 
     if (response['code'] == 1) {
       List<dynamic> data = response['data'];
