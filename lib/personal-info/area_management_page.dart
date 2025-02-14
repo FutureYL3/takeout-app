@@ -19,6 +19,7 @@ class _AreaManagementPageState extends State<AreaManagementPage> {
   String? phone;
   String? schoolName;
   String? deliveryArea;
+  String? collegeId;
   final PersonalInfoApiService personalInfoApiService = PersonalInfoApiService();
   final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
   
@@ -57,16 +58,20 @@ class _AreaManagementPageState extends State<AreaManagementPage> {
     if (response['code'] == 1) {
       final String? tempDeliveryArea = response['data']['location'];
       final String? tempSchoolName = response['data']['college'];
+      final String? tempCollegeId = response['data']['college_id'];
       setState(() {
         deliveryArea = tempDeliveryArea;
         schoolName = tempSchoolName;
+        collegeId = tempCollegeId ?? '';
       });
     }
   }
 
   // 显示修改区域的对话框
   Future<void> _showModifyAreaDialog() async {
-    String modifiedArea = deliveryArea ?? '校区1'; // 设置初始值
+    String modifiedArea = deliveryArea ?? '请设置配送区域'; // 设置初始值
+    Map<String, dynamic> response = await personalInfoApiService.getPlaces(collegeId!, context);
+    List<dynamic> places = response['data'];
     final String? selectedArea = await showDialog<String>(
       context: context,
       builder: (context) => StatefulBuilder(
@@ -80,13 +85,17 @@ class _AreaManagementPageState extends State<AreaManagementPage> {
                 const SizedBox(height: 10),
                 DropdownButton<String>(
                   value: modifiedArea,
-                  items: <String>['校区1', '校区2', '校区3']
-                      .map((String value) {
+                  items: places.map((dynamic region) {
                     return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
+                      value: region['region'],
+                      child: Text(region['region']),
                     );
-                  }).toList(),
+                  }).toList()
+                      ..add(DropdownMenuItem<String>(
+                      value: deliveryArea ?? '请设置配送区域',
+                      child: Text(deliveryArea ?? '请设置配送区域'),
+                      )
+                    ),
                   onChanged: (newValue) {
                     setState(() {
                       modifiedArea = newValue!;

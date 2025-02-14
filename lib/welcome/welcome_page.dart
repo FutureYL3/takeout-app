@@ -18,9 +18,13 @@ class WelcomePage extends StatelessWidget {
           children: [
             SizedBox(height: MediaQuery.sizeOf(context).height * 0.05),
             // App Logo
-            const Text(
-              'LOGO',
-              style: TextStyle(fontSize: 24),
+            SizedBox(
+              width: 108,
+              height: 108,
+              child: Image.asset(
+                'assets/logo/108pt/takeout108.png',
+                fit: BoxFit.contain, // 可以根据需求调整适应方式
+              ),
             ),
             SizedBox(height: MediaQuery.sizeOf(context).height * 0.25),
             // 登录按钮

@@ -107,7 +107,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
               children: sysNotification.map((e) => ListTile(
                 title: Text(e.title),
                 subtitle: Text(e.content),
-                trailing: Text(e.releaseTime),
+                trailing: Text("${e.releaseTime.substring(0, 5)} ${e.releaseTime.substring(6)}"),
               )).toList(),
             )
           ],

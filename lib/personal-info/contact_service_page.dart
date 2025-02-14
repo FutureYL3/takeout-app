@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class ContactServicePage extends StatelessWidget {
-  final TextEditingController _controller = TextEditingController();
+  // final TextEditingController _controller = TextEditingController();
 
-  ContactServicePage({super.key});
+  const ContactServicePage({super.key});
 
   @override
   Widget build(BuildContext context) {

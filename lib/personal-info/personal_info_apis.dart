@@ -63,16 +63,16 @@ class PersonalInfoApiService {
   }  
 
   Future<void> _requestPermissions() async {
-  var status = await Permission.photos.status;
-  if (!status.isGranted) {
-    await Permission.photos.request(); // 请求访问相册权限
-  }
+    var status = await Permission.photos.status;
+    if (!status.isGranted) {
+      await Permission.photos.request(); // 请求访问相册权限
+    }
 
-  var cameraStatus = await Permission.camera.status;
-  if (!cameraStatus.isGranted) {
-    await Permission.camera.request(); // 请求相机权限
+    var cameraStatus = await Permission.camera.status;
+    if (!cameraStatus.isGranted) {
+      await Permission.camera.request(); // 请求相机权限
+    }
   }
-}
   
   Future<Map<String, dynamic>> getPersonalInfo(String phone, BuildContext ctx) async {
     try {
@@ -100,6 +100,20 @@ class PersonalInfoApiService {
       // 处理 Dio 的错误
       print(e.message);
       showSnackBar('获取配送区域失败', e.message!, ContentType.failure, ctx);
+      return {};
+    }
+  }
+
+  Future<Map<String, dynamic>> getPlaces(String id, BuildContext ctx) async {
+    try {
+      Response response = await dio.get('/common/getPlace/$id');
+      // print(response);
+      print(response.data);
+      return response.data;
+    } on DioException catch (e) {
+      // 处理 Dio 的错误
+      print(e.message);
+      showSnackBar('获取待选区域失败', e.message!, ContentType.failure, ctx);
       return {};
     }
   }

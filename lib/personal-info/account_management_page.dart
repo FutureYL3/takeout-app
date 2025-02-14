@@ -45,15 +45,12 @@ class _AccountManagementPageState extends State<AccountManagementPage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           // 平台Logo
-          Container(
-            width: 100,
-            height: 100,
-            color: Colors.grey[300],
-            child: const Center(
-              child: Text(
-                '平台logo',
-                style: TextStyle(fontSize: 16, color: Colors.black),
-              ),
+          SizedBox(
+            width: 108,
+            height: 108,
+            child: Image.asset(
+              'assets/logo/108pt/takeout108.png',
+              fit: BoxFit.contain, // 可以根据需求调整适应方式
             ),
           ),
           const SizedBox(height: 20),
