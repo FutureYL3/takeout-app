@@ -20,9 +20,9 @@ class _AreaManagementPageState extends State<AreaManagementPage> {
   String? schoolName;
   String? deliveryArea;
   String? collegeId;
-  final PersonalInfoApiService personalInfoApiService = PersonalInfoApiService();
+  final PersonalInfoApiService personalInfoApiService =
+      PersonalInfoApiService();
   final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
-  
 
   @override
   void initState() {
@@ -39,9 +39,11 @@ class _AreaManagementPageState extends State<AreaManagementPage> {
       return;
     }
 
-    Map<String, dynamic> response = await personalInfoApiService.getDeliveryArea(phone!, context);
+    Map<String, dynamic> response =
+        await personalInfoApiService.getDeliveryArea(phone!, context);
     if (response['code'] == 401) {
-      Map<String, dynamic> refreshData = await personalInfoApiService.refreshAccessToken(context);
+      Map<String, dynamic> refreshData =
+          await personalInfoApiService.refreshAccessToken(context);
       if (refreshData['code'] == 409) {
         // 如果refreshToken也过期了，要求重新登录
         await secureStorage.deleteAll();
@@ -50,8 +52,10 @@ class _AreaManagementPageState extends State<AreaManagementPage> {
         return;
       }
       if (refreshData['code'] == 1) {
-        secureStorage.write(key: 'accessToken', value: refreshData['data']['accessToken']);
-        secureStorage.write(key: 'refreshToken', value: refreshData['data']['refreshToken']);
+        secureStorage.write(
+            key: 'accessToken', value: refreshData['data']['accessToken']);
+        secureStorage.write(
+            key: 'refreshToken', value: refreshData['data']['refreshToken']);
       }
       getData();
     }
@@ -70,8 +74,10 @@ class _AreaManagementPageState extends State<AreaManagementPage> {
   // 显示修改区域的对话框
   Future<void> _showModifyAreaDialog() async {
     String modifiedArea = deliveryArea ?? '请设置配送区域'; // 设置初始值
-    Map<String, dynamic> response = await personalInfoApiService.getPlaces(collegeId!, context);
+    Map<String, dynamic> response =
+        await personalInfoApiService.getPlaces(collegeId!, context);
     List<dynamic> places = response['data'];
+    print(places);
     final String? selectedArea = await showDialog<String>(
       context: context,
       builder: (context) => StatefulBuilder(
@@ -90,12 +96,11 @@ class _AreaManagementPageState extends State<AreaManagementPage> {
                       value: region['region'],
                       child: Text(region['region']),
                     );
-                  }).toList()
-                      ..add(DropdownMenuItem<String>(
-                      value: deliveryArea ?? '请设置配送区域',
-                      child: Text(deliveryArea ?? '请设置配送区域'),
-                      )
-                    ),
+                  }).toList(),
+                  // ..add(DropdownMenuItem<String>(
+                  //   value: deliveryArea ?? '请设置配送区域',
+                  //   child: Text(deliveryArea ?? '请设置配送区域'),
+                  // )),
                   onChanged: (newValue) {
                     setState(() {
                       modifiedArea = newValue!;
@@ -132,17 +137,19 @@ class _AreaManagementPageState extends State<AreaManagementPage> {
 
   // 更新配送区域
   Future<void> _updateDeliveryArea(String newArea) async {
-    final Map<String, dynamic> response = await personalInfoApiService.updateDeliveryArea(phone!, newArea, context);
-    
+    final Map<String, dynamic> response = await personalInfoApiService
+        .updateDeliveryArea(phone!, newArea, context);
+
     checkForTokenRefresh(response, context, () => _updateDeliveryArea(newArea));
-    
+
     if (response['code'] == 1) {
       setState(() {
         deliveryArea = newArea; // 更新页面的配送区域
       });
       showSnackBar("修改成功", "配送区域已更新", ContentType.success, context);
     } else {
-      showSnackBar("修改失败", response['msg'] ?? "请稍后再试", ContentType.failure, context);
+      showSnackBar(
+          "修改失败", response['msg'] ?? "请稍后再试", ContentType.failure, context);
     }
   }
 
@@ -153,14 +160,16 @@ class _AreaManagementPageState extends State<AreaManagementPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 10,),
-          Text('所属大学：${schoolName ?? ''}',
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)
+          const SizedBox(
+            height: 10,
           ),
+          Text('所属大学：${schoolName ?? ''}',
+              style:
+                  const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 10),
           Text('配送区域：${deliveryArea ?? ''}',
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)
-          ),
+              style:
+                  const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 20),
           Container(
             width: MediaQuery.of(context).size.width * 0.9,
@@ -172,8 +181,7 @@ class _AreaManagementPageState extends State<AreaManagementPage> {
             child: ElevatedButton(
               onPressed: _showModifyAreaDialog, // 点击按钮显示修改区域对话框
               child: const Text('修改区域',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)
-              ),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             ),
           ),
         ],
