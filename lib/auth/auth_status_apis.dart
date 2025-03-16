@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import '../utils/common_utils.dart';
 
 class AuthStatusApiService {
-  static const String baseUrl = 'http://114.55.108.97:8080';
+  static const String baseUrl = 'https://kangshisudiantong.cn';
   late Dio _dio;
 
   AuthStatusApiService() {

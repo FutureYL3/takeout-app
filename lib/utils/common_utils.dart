@@ -10,7 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../welcome/welcome_page.dart';
 
 class CommonUtilsApiService {
-  static const String baseUrl = 'http://114.55.108.97:8080';
+  static const String baseUrl = 'https://kangshisudiantong.cn';
   late Dio _dio;
   final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
 
@@ -110,7 +110,7 @@ class CommonUtilsApiService {
     // print('尝试刷新token');
     try {
       Response response = await _dio.get('/common/newToken/login');
-      // print('成功刷新token');
+      print('成功刷新token');
       return response.data;
     } on DioException catch (e) {
       // 处理 Dio 的错误
