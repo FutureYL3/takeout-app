@@ -44,7 +44,8 @@ dependencies:
   image_picker: ^1.1.2
   permission_handler: ^11.3.1
   intl: ^0.19.0
-  flutter_phone_direct_caller: ^2.1.1
+#  flutter_phone_direct_caller: ^2.1.1
+  url_launcher: ^6.0.9 # 跳转到外部浏览器打开
   connectivity_plus: ^6.0.5
   
 
@@ -59,7 +60,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^3.0.0
-  build_runner: ^2.4.12
+  build_runner: ^2.4.11
   json_serializable: ^6.8.0
 
 # For information on the generic Dart part of this file, see the

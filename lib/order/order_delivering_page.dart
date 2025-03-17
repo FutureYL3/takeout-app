@@ -1,15 +1,15 @@
 /// @Author: yl Future_YL@outlook.com
 /// @Date: 2024-09-20 
-/// @LastEditors: yl Future_YL@outlook.com
-/// @LastEditTime: 2024-10-06 16:16
+/// @LastEditors: Hui_Loading 3080811164@qq.com
+/// @LastEditTime: 2025-03-17 21:28:35
 /// @FilePath: lib/order/order_delivering_page.dart
 /// @Description: 这是配送中订单页面
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 
 import 'order_card.dart';
@@ -75,7 +75,7 @@ class _OrderDeliveringPageState extends State<OrderDeliveringPage> with Automati
 
   void _showContactOptions(BuildContext context, String countryCode, String phoneNumber) {
     void makeDirectCall() async {
-      await FlutterPhoneDirectCaller.callNumber('$countryCode$phoneNumber');
+      await makePhoneCall('$phoneNumber');
     }
 
     showCupertinoModalPopup(
@@ -211,4 +211,16 @@ class _OrderDeliveringPageState extends State<OrderDeliveringPage> with Automati
       ),
     );
   }
+}
+
+
+Future<void> makePhoneCall(String phoneNumber) async {
+  final Uri launchUri = Uri(
+    scheme: 'tel',
+    path: phoneNumber,
+  );
+  if (!await canLaunchUrl(launchUri)) {
+    throw '无法拨打电话: $phoneNumber';
+  }
+  await launchUrl(launchUri);
 }
